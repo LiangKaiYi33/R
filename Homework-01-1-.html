@@ -1647,10 +1647,8 @@ summary {
 <ol start="2" style="list-style-type: lower-alpha">
 <li>How many rows and columns does <code>iowa.df</code> have?</li>
 </ol>
-<pre class="r"><code>nrow(iowa.df)</code></pre>
-<pre><code>## [1] 33</code></pre>
-<pre class="r"><code>ncol(iowa.df)</code></pre>
-<pre><code>## [1] 10</code></pre>
+<pre class="r"><code>dim(iowa.df)</code></pre>
+<pre><code>## [1] 33 10</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>What are the names of the columns of <code>iowa.df</code>?</li>
 </ol>
@@ -1672,17 +1670,19 @@ summary {
   </script>
 </div>
 <ol start="2" style="list-style-type: decimal">
-<li>Syntax and class-typing.
+<li>Syntax and class-typing.</li>
+</ol>
 <ol style="list-style-type: lower-alpha">
 <li>For each of the following commands, either explain why they should be errors, or explain the non-erroneous result.</li>
-</ol></li>
 </ol>
 <pre><code>vector1 &lt;- c(&quot;5&quot;, &quot;12&quot;, &quot;7&quot;, &quot;32&quot;)
 max(vector1)
 sort(vector1)
 sum(vector1)</code></pre>
-<p>solution:the type of the elements of vector1 is string, so the result of max(vector1) is “7”. The result of sort(vector1) is “12” “32” “5” “7”. Cause sum() can only be used to data whose type is int, so it will be error.</p>
-<pre><code>b. For the next series of commands, either explain their results, or why they should produce errors.</code></pre>
+<p><strong>解</strong>：由于vector1中的数据格式为字符型，所以只能进行对字符类型的操作。max(vector1)的结果为“7”。sort(vector1)的结果为“12” “32” “5” “7”。而sum()只能对数字型数据才有效，所以将会报错。</p>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>For the next series of commands, either explain their results, or why they should produce errors.</li>
+</ol>
 <pre><code>vector2 &lt;- c(&quot;5&quot;,7,12)
 vector2[2] + vector2[3]
 
@@ -1692,20 +1692,47 @@ dataframe3[1,2] + dataframe3[1,3]
 list4 &lt;- list(z1=&quot;6&quot;, z2=42, z3=&quot;49&quot;, z4=126)
 list4[[2]]+list4[[4]]
 list4[2]+list4[4]</code></pre>
+<p><strong>解</strong>:在用c()赋值时，如果元素中含有字符型数据，则将所有非字符数据都转化为字符型，所以vector2=“5” “7” “12”，而对于字符串是没有加法操作的。</p>
+<p>在用data.frame()进行数据框赋值时，数据类型不变，所以[1,2]和[1,3]的数据类型都是数字类型，可以进行dataframe3[1,2]+dataframe3[1,3]，结果为19。</p>
+<p>在list数据中，用list[i]调用的是其第i个组分，仍然是一个列表，所以无法做加法，而list[[i]]访问的是第i个组分的元素值，如这里list4[[2]]就是元素42，所以可以进行加法，list4[[2]]+list[[4]]=168.</p>
 <ol start="3" style="list-style-type: decimal">
-<li>Working with functions and operators.
+<li>Working with functions and operators.</li>
+</ol>
 <ol style="list-style-type: lower-alpha">
 <li>The colon operator will create a sequence of integers in order. It is a special case of the function <code>seq()</code> which you saw earlier in this assignment. Using the help command <code>?seq</code> to learn about the function, design an expression that will give you the sequence of numbers from 1 to 10000 in increments of 372. Design another that will give you a sequence between 1 and 10000 that is exactly 50 numbers in length.</li>
-<li>The function <code>rep()</code> repeats a vector some number of times. Explain the difference between `rep(1:3, times=3) and rep(1:3, each=3).</li>
-</ol></li>
 </ol>
+<pre class="r"><code>seq(from=1,to=10000,by=372)</code></pre>
+<pre><code>##  [1]    1  373  745 1117 1489 1861 2233 2605 2977 3349 3721 4093 4465 4837 5209
+## [16] 5581 5953 6325 6697 7069 7441 7813 8185 8557 8929 9301 9673</code></pre>
+<pre class="r"><code>seq(from=1,to=10000,length.out=50)</code></pre>
+<pre><code>##  [1]     1.0000   205.0612   409.1224   613.1837   817.2449  1021.3061
+##  [7]  1225.3673  1429.4286  1633.4898  1837.5510  2041.6122  2245.6735
+## [13]  2449.7347  2653.7959  2857.8571  3061.9184  3265.9796  3470.0408
+## [19]  3674.1020  3878.1633  4082.2245  4286.2857  4490.3469  4694.4082
+## [25]  4898.4694  5102.5306  5306.5918  5510.6531  5714.7143  5918.7755
+## [31]  6122.8367  6326.8980  6530.9592  6735.0204  6939.0816  7143.1429
+## [37]  7347.2041  7551.2653  7755.3265  7959.3878  8163.4490  8367.5102
+## [43]  8571.5714  8775.6327  8979.6939  9183.7551  9387.8163  9591.8776
+## [49]  9795.9388 10000.0000</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>The function <code>rep()</code> repeats a vector some number of times. Explain the difference between `rep(1:3, times=3) and rep(1:3, each=3).</li>
+</ol>
+<p><strong>解</strong>:前者是将序列整体重复3遍，结果是123123123；后者是将每个元素分别重复三遍，结果为111222333。</p>
 <p>MB.Ch1.2. The orings data frame gives data on the damage that had occurred in US space shuttle launches prior to the disastrous Challenger launch of 28 January 1986. The observations in rows 1, 2, 4, 11, 13, and 18 were included in the pre-launch charts used in deciding whether to proceed with the launch, while remaining rows were omitted.</p>
 <p>Create a new data frame by extracting these rows from orings, and plot total incidents against temperature for this new data frame. Obtain a similar plot for the full data set.</p>
-<p>MB.Ch1.4. For the data frame ais (DAAG package)</p>
+<pre class="r"><code>newdata1=orings[c(1,2,4,11,13),]
+plot(Total~Temperature,data=newdata1,col=2,pch=16,cex=1)</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAA2FBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZpAAZrY6AAA6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kNtmAABmOgBmOjpmZjpmZmZmZpBmkJBmkLZmkNtmtrZmtttmtv+QOgCQOjqQZgCQZjqQZmaQkLaQtraQttuQtv+Q29uQ2/+2ZgC2Zjq2kDq2kGa2kLa2tpC2tra2ttu227a229u22/+2///bkDrbkGbbtmbbtpDbtrbb25Db27bb29vb2//b/7bb/9vb///fU2v/tmb/25D/27b/29v//7b//9v///8GE7l7AAAACXBIWXMAAB2HAAAdhwGP5fFlAAAag0lEQVR4nO3de2PTVoKHYYXLJoVpy2XoMlPY6ex0l7BM6QIpdAu7IVzs7/+NVvIttmWTnB+KjMLz/AGJEinm+ORFtmS5GgMQqXZ9AwCGSkABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEBJQgJCAAoQEFCAkoAAhAQUICShASEABQgIKEPqyA1oBdKb7RHW+xQ7terSBy6XzRnW9wS5dwH8YwFdLQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChIYa0NHvT399U76agALdGVJAP7yeJ/PVncmFpPa+Py7cxHn/uW9rhZsGvjoDCujH29WVF80Ho8eLa/HtPSjbxvn+uW9nym8j8DUZYkAPm3J+e+/e3SahZQU91z/37VsFBc5hgAE9qbM5fez+/mE1a+p5neef+/atggLnMcCA1jug+7NFo7qgt0q2IaBAd4YX0Caai8ft9d7o9ZIDSef45759q6DAuQwvoIunQpeWbbspyVtACShwTgK6TkCBcxpeQMeH1d6j+bJ3B2VHkQQU6M7AAvpoPHnec3Hg6AKeA3UQCTinYQW0dvVfn/1tsQvaLHIUHtiRwQV0avK4ffTbwUWcB+pEeuB8BhTQuph/PLl7cBrQpqinT4eei5dyAt0ZVEAnJhWdB/Ta87KVXUwE6M7wAnpq9M/CfLqcHdClIQc0IKBAdwQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBouAEd/f701+PSlQQU6M5wA/rxdnXlRelKAgp0R0ABQkMK6IfXy/6oA/qs/vtNySYEFOjOgAJa73JuUrQbKqBAdwQUIDSggI5fHlTV3r25Px9Ue9/Wf/9QciheQIHuDCmg4/cPq+ra89kn5ziItGmH9eJuHfC1GVRAx+Pf6t3Ov0w/FFBgxwYW0PH7O1V1fbIT6jQmYMeGFtDx6L+qau/HsYACOze4gI7H7+qd0O+OBRTYtQEGdDx6XO+E/iygwI4NMaDTE5q+PRBQYKeGGdDJCU2F59BPCCjQnYEGdHJCk4ACOzXYgI7f/73sRUgTAgp0Z7gBjQgo0B0BBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgAKGLDejH29UmV150/UPPfeMEFOiMgAKELjigd29sclNAgUvAc6AAIQEFCAkoQGgnAX193PUPPS8BBbrTU0BHv9ybu/GNo/DApdBPQE8OnMYEXDq9BPTdaj+r7zyEBy6BXgJ61ETzl9vV3l+f3KmqvQdd/8jzE1CgO30EdPSwqm6Nx4dV9WAS0+s72wEVUKBDfQT0Y73v+WiSzlvTmu5uF1RAge70FNDmsNFJVe2PF3/thoAC3ekxoO8OJg/e68929xheQIHu9PQcaBPQWTlnOd0NAQW608tR+MPJc6CnHRVQ4DLo6zSm/fH8MPzJLg/DCyjQnV4C2lxXuY5mnc4rz/7ntoNIwOXQ00s5Jy/fbM5gajSP53dEQIHu9HQxkVd3Jk9/3pn088euf+T5CSjQnZ4vZ/fq3r37b7r+iQUEFOiOCyoDhHo5D/T3p78uHXf//cl9R+GBS6DHVyJt/KxnAgp0R0ABQhcc0N+aN/H480G19+3iLT3udHRF+j+e/lp+OEpAge5ccEDXr0U/tf8Zm5++Id3oyWTD134uvXECCnTmoh/CH27o57V4B/T9T83qj5Y2+33hjRNQoDMXHdDR06dPf6kfwv/j6cLreNOz/dm9Ryf1nzfv3Ws+vVV24wQU6Ez/B5FyzUvqqxvf1Pugd6YvBx09Ln1dqIAC3dnBeaCxo6q68ny2Hzp9V5DZuy0V3DgBBTozoFciLd5Nael96UqvjSegQHf6C+iH5vnP4MyjhcUzAfUu6P76ss03ZYP85wOs6iugL7+ZBSy/FtMilvUH++vLNt8UAQUuUE8BfbyUsO/D50Nn745cP5b/txt/mm2j3hktOj4loEB3+gnoUbPr+d3Tp7/8dPAZ59Efto8YHRVuTUCB7vQS0Oa4+Wy/s/zMo1MnrVXf33YUHtiZnt6Vc2k/8TDeBZ28JcifTp8AmLyes+wN6gQU6E5P7wu/tOdY746m78r5cfVCJM2J9YV7swIKdGdYl7Or9zlXt3TteeGNE1CgM8MK6KrRPwvzKaBAlwb1EP7zCSjQnSEdROqAgALd6SWgzdXn5i9Aerm4EsguCCjQnX5OpG+uf3ztH69fv/7lzmdekP4zCSjQnX4COjmDc253z4AKKNClnl4LP1q8GH4vfSl8JwQU6E5/l7P7/e/37t374deuf1wZAQW6M6ALKndBQIHuCChA6GID+vHujZvdvOqoIwIKdOeCA9rZyzY7IqBAdwQUICSgACEBBQgJKEBIQAFCFx/QZ69b3nT9M89/4wQU6MyFB3ST3e2VCijQHQEFCF14QPe+vdfyg7f0AC4BB5EAQgIKEBJQgJCAAoQEFCAkoAAhAQUIXfBbenzY4cs2NxFQoDveEwkgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAoYEFdPTk7o1v//148fnH29WVFwXrCyjQnWEF9LeDqrF3f55QAQV2Z1ABParmrs8KKqDA7gwpoO/q/c9rP79+/bj5e5pNAQV2Z0gBPZrveb6/My+ogAK7M6CAjh5W1YPTDyctFVBgdwYU0OVYNgXdH58V0GqDi7p1wNdnoAFtPqluCSiwS0MNaHNEae+Rh/DADg0ooEvPgTZOqurKcwEFdmdAAW2Owu+vfnrlvwUU2JkhBbQ5D/S7N6efH06e1BRQYEeGFNDJK5GWe/lYQIEdGlRAxy8PVntZfy6gwK4MK6Dj0asfjlc+f3wgoMCODCygn0tAge4IKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIDSeFvb9W34KhjoITj/vSSgTOeL3+weGOghKLmXBJTFhPGLfcEM9BAU3UsCytu3frF7YaCHoOxeGlBAP96uNrnyouTGCWib3+ueGOghENBP3TgBbXn71i92Lwz0EBTeSwMK6Pj9ncKAbvr2C7t1g+X3uicGeggucUDHo4dVdavg+wX0PPxe98RAD8FlDuikoA8+ZwMC2ub3uicGeggudUCb50GLnvNcJ6Ab+LXuiYEegrJ7aWABHZ+UPYhfJ6Ab+L3uiYEegssd0PpB/OfsggroJn6te2Kgh6DoXhpaQMfv7t37j3xtAd3Ir3VPDPQQlNxLgwvo5xHQLfxW98RAD8H57yUBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUIPTVBRSgO503qusNdmnXgw1cLp03qusNflU8x1DCaBUwWAV2OFjups9hlpcwWgUMVgEBHSizvITRKmCwCgjoQJnlJYxWAYNVQEAHyiwvYbQKGKwCAjpQZnkJo1XAYBUQ0IEyy0sYrQIGq4CADpRZXsJoFTBYBQR0oMzyEkargMEqIKADZZaXMFoFDFYBAR0os7yE0SpgsAoI6ECZ5SWMVgGDVUBAB8osL2G0ChisAgI6UGZ5CaNVwGAVENCBMstLGK0CBquAgA6UWV7CaBUwWAUEdKDM8hJGq4DBKiCgA2WWlzBaBQxWAQEdKLO8hNEqYLAKCCjA8AgoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICWmb0sFp4sGUJp0Yvb9TjcuPH48WS9z8dVNXed893eKO+VOuDZWptcVStuDVdupOZJaBlPt5en9PtJSy8O5iNzLUXsyUvZ0v2/rLTG/Ylag2WqbXFxoDuZmYJaJmTan1Ot5cwt0hCVV2f7ladGKxtPjlYRmvZpoDuaGYJaJmj1t3TXsJMswe192P9UPTJwWyWN0uu1Y+x/rhTVVdenLX+V6U9WKbWOdRjtN/8vauZJaBlDlv3TnsJM0eLuXwy26s6mu9dNU/v3drlbfvitAfL1DrbYqx2NbMEtEh971w/PmMJM/XQ7D1a+XBpSf2A1bgtaQ+WqXW2er9zOmo7m1kCWqS+w/bPWsJMPZP3V5fUgzWf20sznvGmwTK1znY439vc2cwS0CL1I4YH7+9WVXXz561LmDlpPZY6qU6TcOgJvmXtwTK1znSyfLxtf76015kloEWOqr0/zw71fXe8ZQkzk2Mgk5Pzrv44XbJcCUdIVrQHy9Q6y9K+5s5mloAWOVw6eWL+RP/6EmYO6+k9P+Fkemrj8tTesMv1NWsPlql1lqPT3c6dzSwBLdEc4du7f9y86GF2+ll7CXOHp3tQsyPMArpVe7BMrTMsjiCNBXQglu6y2Vkn7SXMTF+I2Lyy7sPjarqvIKDbbBgsU+sMy897CujQNDP+wRlLvm6TJsxmcj2nmxgI6DYbBmvtq6bWmpWj7QI6OEetu6m95Ot2uPTU3fTIqIBu1R6sZaZW28r5ngI6OBtP0jHLlxwujcd0bByF36o9WMtMrbaV/1QchR8cs/wsR5sCuj9f4jzQFe3BWmZqtayeL+880MFxWZGzrD3Jf8srkT6hPVjLTK2W1VdseiXSICzN7Nkx0vYS5uopvjh2PN0r8Fr4rdqDZWp90ur/Ml4LPwins3x0ON1jaC9hoRmR6VR+eXoiqKsxbdYaLFPrkw5X/09xNaYhmJzb3LzjQnPVwfkVc9aWsNBcIvjas9mpjafXA33meqAbtAbL1PqUenRWJtCuZpaAFlm6avjsv7n2EhaWrhzuivRnaQ2WqfUJS096Trki/SC8uzO7kxbvvNJewsJv8wYsroYxX2K0WlqDZWpt136mczczS0ALjV41Fxi7ev/NJ5aw8OHJN/WUvvnsdIl35dyqNVim1lYbrp/qXTkBhkRAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKD05qhad6vfG/D+535/HpeegNKbHQd09LjvYHPpCSi92XFAT3rf4+XSE1D69vF2deXFDn6ugNI5AaVvAsqlIaD0TUC5NASUvq0HdPTyRlVVN38+nn/1+vHo5TdVda05Zj56clBVV3+cfOndQbU/fn+3qva+f7N55fFhvfKret2bz+tPPjxpvrZ3c3Ls/WT2tOuD8ehhtfdoPN/i9eP11dY2CdsJKH1bC2gdsalrz2dfvf5/D+fHmN7fmX60P/vO/dl3LxVweeWmhC/nXz89ZtVE8qyALlZb3yRsJ6D0bTWgi15V06VNQP82W7D3nw+rRfcm3/ov8wXTBK6vXJfw6sEsuMvH/G+dGdDFaq1NwnYCSt9WAlp/MnmsPnp5MN3PbBZU156Nx+9vz3cDX82+NGlbs2D5e1dWrktY72/O92SrySP9P+5Md0EXz4FuDOjyaqubhO0ElL6tBPRkVrfJ4qZrTcGmS06qpY+aD5qAThfUHzXf21q5KeFsycmif/U3T37epwN6utraJmE7AaVvKwE9PK3UNHBNQB/Mv2/2tdkas2xOV2u+t7XybPnmn/fpgN7acnvgEwSUvi0HdHLMffbx5CD70ldbH81zN57tX7ZXbkr4YOWHffj97wfVeQK6iPb6JmE7AaVvawFdVsfr0wHdn603+bC98vIO5Hj06u78gNDZAT3d113fJGwnoPRtOaBLx7xLA3r9uL3yckCXv3rugG7YJGwnoPRtLaBrkSrYA22vvBTQ6b7k1Zs//ON/z/Mc6GlARZPzE1D6tvYQfu1sy7LnQNdP1TwN6NHiTPhzHURaPVwF5yOg9G05UnXM1o76fDqg8xUPZ2fEr618WsKlSp6sPYRfrexqQDdsErYTUPq2spdXJ+zK88WHt84K6Owx/CylrZU3BbQ5IX89oLPNvL+9HtANm4TtBJS+tV6JtPdjHbEPj6v5ifSfCmj13fPVVy2trLxUwsPpQ/jJxUimCxfnyDcv8vz+eLqZ9YC2NwnbCSh9W32e8WTpoPet8VkBvbpyYlJr5aUSLn9punB6hP3B8rlKf729HtD2JmE7AaVvawdqTg5WenXGUfhZ36692Ljycgkfz+N5f/a85ujh/Pvma9362A5oa5OwnYDSt9b1QCeX7bx6/83aVzefxvTuzuL6oO2VV0r46u7kK8eLl8WPfmoeuzcffXh80Fzxc7wpoOubhO0ElMHw2kq+NALKYAgoXxoBZTAElC+NgDIYAsqXRkAZDAHlSyOgDIaA8qURUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQgJKAAIQEFCAkoQEhAAUICChASUICQgAKEBBQg9P9UZTFX759XmQAAAABJRU5ErkJggg==" width="672" /> MB.Ch1.4. For the data frame ais (DAAG package)</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Use the function str() to get information on each of the columns. Determine whether any of the columns hold missing values.</p></li>
 <li><p>Make a table that shows the numbers of males and females for each different sport. In which sports is there a large imbalance (e.g., by a factor of more than 2:1) in the numbers of the two sexes?</p></li>
 </ol>
+<pre class="r"><code>table(Sex=ais$sex,Sports=ais$sport)</code></pre>
+<pre><code>##    Sports
+## Sex B_Ball Field Gym Netball Row Swim T_400m T_Sprnt Tennis W_Polo
+##   f     13     7   4      23  22    9     11       4      7      0
+##   m     12    12   0       0  15   13     18      11      4     17</code></pre>
+<p><strong>解</strong>:其中Gym,Netball,T_Sprnt,W_polo男女相差比较大。</p>
 <p>MB.Ch1.6.Create a data frame called Manitoba.lakes that contains the lake’s elevation (in meters above sea level) and area (in square kilometers) as listed below. Assign the names of the lakes using the row.names() function. elevation area Winnipeg 217 24387 Winnipegosis 254 5374 Manitoba 248 4624 SouthernIndian 254 2247 Cedar 253 1353 Island 227 1223 Gods 178 1151 Cross 207 755 Playgreen 217 657</p>
 <ol style="list-style-type: lower-alpha">
 <li>Use the following code to plot log2(area) versus elevation, adding labeling infor- mation (there is an extreme value of area that makes a logarithmic scale pretty much essential):</li>

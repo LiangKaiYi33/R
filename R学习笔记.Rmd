@@ -1,0 +1,13 @@
+---
+title: "R学习笔记"
+output: github_document
+---
+1.在用c()赋值时，如果其中一个元素是字符，则非字符值被强制转化为字符类型。
+2.list[i]返回的是一个组分仍然是列表，list[[i]]返回的是组分的元素值，是向量类型。
+3.summary()同时整理了min,1st,median,mean,3rd,max。
+4.x[-c(2,3)]表示从向量中去除2,3位的元素。
+5.画图加label,
+  plot(Brainwt~Bodywt,xlim=(0,300),data=primates)
+  with(primates,text(Brainwt~Bodywt,labels=row.names(primates),pos=4))
+  其中xlim预留空间，pos=4表示在点的右侧，1下2左3上4右。
+6.
