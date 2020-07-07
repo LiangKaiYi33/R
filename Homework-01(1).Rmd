@@ -1,9 +1,9 @@
 ---
 title: "Homework 1"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
   word_document: default
 ---
 ```{r setup, message = F, include=FALSE}
