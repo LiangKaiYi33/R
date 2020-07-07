@@ -1,0 +1,554 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Homework 1},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Homework 1}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The Iowa data set iowa.csv is a toy example that summarises the yield
+  of wheat (bushels per acre) for the state of Iowa between 1930-1962.
+  In addition to yield, year, rainfall and temperature were recorded as
+  the main predictors of yield.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  First, we need to load the data set into R using the command
+  \texttt{read.csv()}. Use the help function to learn what arguments
+  this function takes. Once you have the necessary input, load the data
+  set into R and make it a data frame called \texttt{iowa.df}.
+\end{enumerate}
+
+\textbf{解}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iowa.df<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"data/iowa.csv"}\NormalTok{,}\DataTypeTok{header=}\NormalTok{T,}\DataTypeTok{sep=}\StringTok{';'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  How many rows and columns does \texttt{iowa.df} have?
+\end{enumerate}
+
+\textbf{解}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(iowa.df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 33 10
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  What are the names of the columns of \texttt{iowa.df}?
+\end{enumerate}
+
+\textbf{解}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{names}\NormalTok{(iowa.df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Year"  "Rain0" "Temp1" "Rain1" "Temp2" "Rain2" "Temp3" "Rain3" "Temp4"
+## [10] "Yield"
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  What is the value of row 5, column 7 of \texttt{iowa.df}?
+\end{enumerate}
+
+\textbf{解}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iowa.df[}\DecValTok{5}\NormalTok{,}\DecValTok{7}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 79.7
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Display the second row of \texttt{iowa.df} in its entirety.
+\end{enumerate}
+
+\textbf{解}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iowa.df[}\DecValTok{2}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Year Rain0 Temp1 Rain1 Temp2 Rain2 Temp3 Rain3 Temp4 Yield
+## 2 1931 14.76  57.5  3.83    75  2.72  77.2   3.3  72.6  32.9
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Syntax and class-typing.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  For each of the following commands, either explain why they should be
+  errors, or explain the non-erroneous result.
+\end{enumerate}
+
+\begin{verbatim}
+vector1 <- c("5", "12", "7", "32")
+max(vector1)
+sort(vector1)
+sum(vector1)
+\end{verbatim}
+
+\textbf{解}：由于vector1中的数据格式为字符型，所以只能进行对字符类型的操作。max(vector1)的结果为``7''。sort(vector1)的结果为``12''
+``32'' ``5'' ``7''。而sum()只能对数字型数据才有效，所以将会报错。
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  For the next series of commands, either explain their results, or why
+  they should produce errors.
+\end{enumerate}
+
+\begin{verbatim}
+vector2 <- c("5",7,12)
+vector2[2] + vector2[3]
+
+dataframe3 <- data.frame(z1="5",z2=7,z3=12)
+dataframe3[1,2] + dataframe3[1,3]
+
+list4 <- list(z1="6", z2=42, z3="49", z4=126)
+list4[[2]]+list4[[4]]
+list4[2]+list4[4]
+\end{verbatim}
+
+\textbf{解}:在用c()赋值时，如果元素中含有字符型数据，则将所有非字符数据都转化为字符型，所以vector2=``5''
+``7'' ``12''，而对于字符串是没有加法操作的。
+
+在用data.frame()进行数据框赋值时，数据类型不变，所以{[}1,2{]}和{[}1,3{]}的数据类型都是数字类型，可以进行dataframe3{[}1,2{]}+dataframe3{[}1,3{]}，结果为19。
+
+在list数据中，用list{[}i{]}调用的是其第i个组分，仍然是一个列表，所以无法做加法，而list{[}{[}i{]}{]}访问的是第i个组分的元素值，如这里list4{[}{[}2{]}{]}就是元素42，所以可以进行加法，list4{[}{[}2{]}{]}+list{[}{[}4{]}{]}=168.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Working with functions and operators.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  The colon operator will create a sequence of integers in order. It is
+  a special case of the function \texttt{seq()} which you saw earlier in
+  this assignment. Using the help command \texttt{?seq} to learn about
+  the function, design an expression that will give you the sequence of
+  numbers from 1 to 10000 in increments of 372. Design another that will
+  give you a sequence between 1 and 10000 that is exactly 50 numbers in
+  length.
+\end{enumerate}
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{1}\NormalTok{,}\DataTypeTok{to=}\DecValTok{10000}\NormalTok{,}\DataTypeTok{by=}\DecValTok{372}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1]    1  373  745 1117 1489 1861 2233 2605 2977 3349 3721 4093 4465 4837 5209
+## [16] 5581 5953 6325 6697 7069 7441 7813 8185 8557 8929 9301 9673
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{seq}\NormalTok{(}\DataTypeTok{from=}\DecValTok{1}\NormalTok{,}\DataTypeTok{to=}\DecValTok{10000}\NormalTok{,}\DataTypeTok{length.out=}\DecValTok{50}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1]     1.0000   205.0612   409.1224   613.1837   817.2449  1021.3061
+##  [7]  1225.3673  1429.4286  1633.4898  1837.5510  2041.6122  2245.6735
+## [13]  2449.7347  2653.7959  2857.8571  3061.9184  3265.9796  3470.0408
+## [19]  3674.1020  3878.1633  4082.2245  4286.2857  4490.3469  4694.4082
+## [25]  4898.4694  5102.5306  5306.5918  5510.6531  5714.7143  5918.7755
+## [31]  6122.8367  6326.8980  6530.9592  6735.0204  6939.0816  7143.1429
+## [37]  7347.2041  7551.2653  7755.3265  7959.3878  8163.4490  8367.5102
+## [43]  8571.5714  8775.6327  8979.6939  9183.7551  9387.8163  9591.8776
+## [49]  9795.9388 10000.0000
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  The function \texttt{rep()} repeats a vector some number of times.
+  Explain the difference between `rep(1:3, times=3) and rep(1:3,
+  each=3).
+\end{enumerate}
+
+\textbf{解}:前者是将序列整体重复3遍，结果是123123123；后者是将每个元素分别重复三遍，结果为111222333。
+
+MB.Ch1.2. The orings data frame gives data on the damage that had
+occurred in US space shuttle launches prior to the disastrous Challenger
+launch of 28 January 1986. The observations in rows 1, 2, 4, 11, 13, and
+18 were included in the pre-launch charts used in deciding whether to
+proceed with the launch, while remaining rows were omitted.
+
+Create a new data frame by extracting these rows from orings, and plot
+total incidents against temperature for this new data frame. Obtain a
+similar plot for the full data set.
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{newdata1=orings[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{11}\NormalTok{,}\DecValTok{13}\NormalTok{),]}
+\KeywordTok{plot}\NormalTok{(Total}\OperatorTok{~}\NormalTok{Temperature,}\DataTypeTok{data=}\NormalTok{newdata1,}\DataTypeTok{col=}\DecValTok{2}\NormalTok{,}\DataTypeTok{pch=}\DecValTok{16}\NormalTok{,}\DataTypeTok{cex=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Homework-01-1-_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+MB.Ch1.4. For the data frame ais (DAAG package)
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  Use the function str() to get information on each of the columns.
+  Determine whether any of the columns hold missing values.
+\end{enumerate}
+
+\textbf{解}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(ais)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    202 obs. of  13 variables:
+##  $ rcc   : num  3.96 4.41 4.14 4.11 4.45 4.1 4.31 4.42 4.3 4.51 ...
+##  $ wcc   : num  7.5 8.3 5 5.3 6.8 4.4 5.3 5.7 8.9 4.4 ...
+##  $ hc    : num  37.5 38.2 36.4 37.3 41.5 37.4 39.6 39.9 41.1 41.6 ...
+##  $ hg    : num  12.3 12.7 11.6 12.6 14 12.5 12.8 13.2 13.5 12.7 ...
+##  $ ferr  : num  60 68 21 69 29 42 73 44 41 44 ...
+##  $ bmi   : num  20.6 20.7 21.9 21.9 19 ...
+##  $ ssf   : num  109.1 102.8 104.6 126.4 80.3 ...
+##  $ pcBfat: num  19.8 21.3 19.9 23.7 17.6 ...
+##  $ lbm   : num  63.3 58.5 55.4 57.2 53.2 ...
+##  $ ht    : num  196 190 178 185 185 ...
+##  $ wt    : num  78.9 74.4 69.1 74.9 64.6 63.7 75.2 62.3 66.5 62.9 ...
+##  $ sex   : Factor w/ 2 levels "f","m": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ sport : Factor w/ 10 levels "B_Ball","Field",..: 1 1 1 1 1 1 1 1 1 1 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in}\NormalTok{ (}\DecValTok{1}\OperatorTok{:}\KeywordTok{dim}\NormalTok{(ais)[}\DecValTok{2}\NormalTok{]))\{}
+\NormalTok{    vec<-}\KeywordTok{is.na}\NormalTok{(ais[,i])}
+    \ControlFlowTok{if}\NormalTok{(}\KeywordTok{any}\NormalTok{(vec))\{}
+        \KeywordTok{cat}\NormalTok{(}\StringTok{"the column"}\NormalTok{,i,}\StringTok{"hold missing values"}\NormalTok{)}
+\NormalTok{    \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+结果没有输出显示，所以没有列含有NA缺省值。
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Make a table that shows the numbers of males and females for each
+  different sport. In which sports is there a large imbalance (e.g., by
+  a factor of more than 2:1) in the numbers of the two sexes?
+\end{enumerate}
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(}\DataTypeTok{Sex=}\NormalTok{ais}\OperatorTok{$}\NormalTok{sex,}\DataTypeTok{Sports=}\NormalTok{ais}\OperatorTok{$}\NormalTok{sport)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Sports
+## Sex B_Ball Field Gym Netball Row Swim T_400m T_Sprnt Tennis W_Polo
+##   f     13     7   4      23  22    9     11       4      7      0
+##   m     12    12   0       0  15   13     18      11      4     17
+\end{verbatim}
+
+其中Gym,Netball,T\_Sprnt,W\_polo男女相差比较大。
+
+MB.Ch1.6.Create a data frame called Manitoba.lakes that contains the
+lake's elevation (in meters above sea level) and area (in square
+kilometers) as listed below. Assign the names of the lakes using the
+row.names() function.
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ele<-}\KeywordTok{c}\NormalTok{(}\DecValTok{217}\NormalTok{,}\DecValTok{254}\NormalTok{,}\DecValTok{248}\NormalTok{,}\DecValTok{254}\NormalTok{,}\DecValTok{253}\NormalTok{,}\DecValTok{227}\NormalTok{,}\DecValTok{178}\NormalTok{,}\DecValTok{207}\NormalTok{,}\DecValTok{217}\NormalTok{)}
+\NormalTok{are<-}\KeywordTok{c}\NormalTok{(}\DecValTok{24387}\NormalTok{,}\DecValTok{5374}\NormalTok{,}\DecValTok{4624}\NormalTok{,}\DecValTok{2247}\NormalTok{,}\DecValTok{1353}\NormalTok{,}\DecValTok{1223}\NormalTok{,}\DecValTok{1151}\NormalTok{,}\DecValTok{755}\NormalTok{,}\DecValTok{657}\NormalTok{)}
+\NormalTok{Manitoba.lakes<-}\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{elevation=}\NormalTok{ele,}\DataTypeTok{area=}\NormalTok{are)}
+\KeywordTok{row.names}\NormalTok{(Manitoba.lakes)<-}\KeywordTok{c}\NormalTok{(}\StringTok{"Winnipeg"}\NormalTok{,}\StringTok{"Winnipegosis"}\NormalTok{,}\StringTok{"Manitoba"}\NormalTok{,}\StringTok{"SouthernIndian"}\NormalTok{,}\StringTok{"Cedar"}\NormalTok{,}\StringTok{"Island"}\NormalTok{,}\StringTok{"Gods"}\NormalTok{,}\StringTok{"Cross"}\NormalTok{,}\StringTok{"Playgreen"}\NormalTok{)}
+\NormalTok{Manitoba.lakes}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                elevation  area
+## Winnipeg             217 24387
+## Winnipegosis         254  5374
+## Manitoba             248  4624
+## SouthernIndian       254  2247
+## Cedar                253  1353
+## Island               227  1223
+## Gods                 178  1151
+## Cross                207   755
+## Playgreen            217   657
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  Use the following code to plot log2(area) versus elevation, adding
+  labeling infor- mation (there is an extreme value of area that makes a
+  logarithmic scale pretty much essential):
+\end{enumerate}
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{attach}\NormalTok{(Manitoba.lakes)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{log2}\NormalTok{(area) }\OperatorTok{~}\StringTok{ }\NormalTok{elevation, }\DataTypeTok{pch=}\DecValTok{16}\NormalTok{, }\DataTypeTok{xlim=}\KeywordTok{c}\NormalTok{(}\DecValTok{170}\NormalTok{,}\DecValTok{280}\NormalTok{))}
+\CommentTok{# NB: Doubling the area increases log2(area) by 1.0}
+\KeywordTok{text}\NormalTok{(}\KeywordTok{log2}\NormalTok{(area) }\OperatorTok{~}\StringTok{ }\NormalTok{elevation, }\DataTypeTok{labels=}\KeywordTok{row.names}\NormalTok{(Manitoba.lakes), }\DataTypeTok{pos=}\DecValTok{4}\NormalTok{)}
+\KeywordTok{text}\NormalTok{(}\KeywordTok{log2}\NormalTok{(area) }\OperatorTok{~}\StringTok{ }\NormalTok{elevation, }\DataTypeTok{labels=}\NormalTok{area, }\DataTypeTok{pos=}\DecValTok{2}\NormalTok{) }
+\KeywordTok{title}\NormalTok{(}\DataTypeTok{main=}\StringTok{"Manitoba’s Largest Lakes"}\NormalTok{,}\DataTypeTok{sub=}\StringTok{"use the logarithmic to smooth the extreme value"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Homework-01-1-_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+Devise captions that explain the labeling on the points and on the
+y-axis. It will be necessary to explain how distances on the scale
+relate to changes in area.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Repeat the plot and associated labeling, now plotting area versus
+  elevation, but specifying log=``y'' in order to obtain a logarithmic
+  y-scale.
+\end{enumerate}
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot.default}\NormalTok{(area }\OperatorTok{~}\StringTok{ }\NormalTok{elevation, }\DataTypeTok{pch=}\DecValTok{16}\NormalTok{, }\DataTypeTok{xlim=}\KeywordTok{c}\NormalTok{(}\DecValTok{170}\NormalTok{,}\DecValTok{280}\NormalTok{),}\DataTypeTok{log=}\StringTok{"y"}\NormalTok{)}
+\KeywordTok{text.default}\NormalTok{(area }\OperatorTok{~}\StringTok{ }\NormalTok{elevation, }\DataTypeTok{labels=}\KeywordTok{row.names}\NormalTok{(Manitoba.lakes), }\DataTypeTok{pos=}\DecValTok{4}\NormalTok{)}
+\KeywordTok{text.default}\NormalTok{(area }\OperatorTok{~}\StringTok{ }\NormalTok{elevation, }\DataTypeTok{labels=}\NormalTok{area, }\DataTypeTok{pos=}\DecValTok{2}\NormalTok{) }
+\KeywordTok{title}\NormalTok{(}\StringTok{"Manitoba’s Largest Lakes"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Homework-01-1-_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+MB.Ch1.7. Look up the help page for the R function dotchart(). Use this
+function to display the areas of the Manitoba lakes (a) on a linear
+scale, and (b) on a logarithmic scale. Add, in each case, suitable
+labeling information.
+
+\textbf{解}： (a)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dotchart}\NormalTok{(area,}\KeywordTok{row.names}\NormalTok{(Manitoba.lakes))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Homework-01-1-_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+(b)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dotchart}\NormalTok{(area,}\KeywordTok{row.names}\NormalTok{(Manitoba.lakes),}\DataTypeTok{log=}\StringTok{"x"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Homework-01-1-_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+MB.Ch1.8. Using the sum() function, obtain a lower bound for the area of
+Manitoba covered by water.
+
+\textbf{解}：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sum}\NormalTok{(area)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 41771
+\end{verbatim}
+
+\end{document}

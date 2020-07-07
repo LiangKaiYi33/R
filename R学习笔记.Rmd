@@ -9,5 +9,5 @@ output: github_document
 5.画图加label,
   plot(Brainwt~Bodywt,xlim=(0,300),data=primates)
   with(primates,text(Brainwt~Bodywt,labels=row.names(primates),pos=4))
-  其中xlim预留空间，pos=4表示在点的右侧，1下2左3上4右。
+  其中xlim定义横轴区间，pos=4表示在点的右侧，1下2左3上4右。
 6.
