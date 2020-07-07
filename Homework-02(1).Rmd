@@ -63,7 +63,7 @@ b. Make a new plot, or pair of plots, which breaks this out by state.  Note that
 
 **解**：
 ```{r}
-xyplot(Median_house_value~Built_2005_or_later|STATEFP,data=ca_pa1,pch=16,cex=0.3,auto.key=list(columns=2),subset=STATEFP%in%c("06","42"))
+xyplot(Median_house_value~Built_2005_or_later|STATEFP,data=ca_pa1,pch=16,cex=0.3,auto.key=list(columns=2))
 ```
 
 3. _Nobody Home_  
