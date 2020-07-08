@@ -56,14 +56,17 @@ f. Are your answers in (c) and (e) compatible? Explain.
     
 **解**：
 ```{r}
-plot(Median_house_value~Built_2005_or_later,data=ca_pa1,pch=16,cex=0.3)
+ggplot(data=ca_pa1)+
+  geom_point(aes(x=Built_2005_or_later,y=Median_house_value))
 ```
 
 b. Make a new plot, or pair of plots, which breaks this out by state.  Note that the state is recorded in the `STATEFP` variable, with California being state 6 and Pennsylvania state 42.
 
 **解**：
 ```{r}
-xyplot(Median_house_value~Built_2005_or_later|STATEFP,data=ca_pa1,pch=16,cex=0.3,auto.key=list(columns=2))
+ggplot(data=ca_pa1)+
+  geom_point(aes(x=Built_2005_or_later,y=Median_house_value))+
+  facet_wrap(~STATEFP)
 ```
 
 3. _Nobody Home_  
@@ -82,14 +85,18 @@ b. Plot the vacancy rate against median house value.
 
 **解**：
 ```{r}
-plot(Vacancy_rates~Median_house_value,data=ca_pa2,pch=16,cex=0.3)
+
+ggplot(data=ca_pa2)+
+  geom_point(aes(x=Median_house_value,y=Vacancy_rates))
 ```
 
 c. Plot vacancy rate against median house value separately for California and for Pennsylvania.  Is there a difference?
 
 **解**：
 ```{r}
-xyplot(Vacancy_rates~Median_house_value|STATEFP,data=ca_pa1,pch=16,cex=0.3,auto.key=list(columns=2))
+ggplot(data=ca_pa2)+
+  geom_point(aes(x=Median_house_value,y=Vacancy_rates))+
+  facet_wrap(~STATEFP)
 ```
     
 4. The column `COUNTYFP` contains a numerical code for counties within each state.  We are interested in Alameda County (county 1 in California), Santa Clara (county 85 in California), and Allegheny County (county 3 in Pennsylvania).
