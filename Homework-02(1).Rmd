@@ -108,6 +108,7 @@ ggplot(data=ca_pa2)+
   geom_point(aes(x=Median_house_value,y=Vacancy_rates),size=0.3)+
   facet_wrap(~statename)
 ```
+
 Pennsylvania和California比起来整体Median_house_value更低而Vacancy_rates略偏高一点。
   
 4. The column `COUNTYFP` contains a numerical code for counties within each state.  We are interested in Alameda County (county 1 in California), Santa Clara (county 85 in California), and Allegheny County (county 3 in Pennsylvania).
