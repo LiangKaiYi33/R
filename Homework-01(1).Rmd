@@ -164,12 +164,12 @@ title("Manitoba’s Largest Lakes")
 MB.Ch1.7. Look up the help page for the R function dotchart(). Use this function to display the areas of the Manitoba lakes (a) on a linear scale, and (b) on a logarithmic scale. Add, in each case, suitable labeling information.
 
 **解**：
-(a)
+\(a\)
 ```{r}
 dotchart(area,row.names(Manitoba.lakes))
 ```
 
-\(b)
+\(b\)
 ```{r}
 dotchart(area,row.names(Manitoba.lakes),log="x")
 ```

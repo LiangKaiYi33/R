@@ -16,7 +16,7 @@ The data set calif_penn_2011.csv contains information about the housing stock of
 a. Load the data into a dataframe called `ca_pa`.
 
 **解**：
-```{r}
+```{r,message = F}
 ca_pa<-read_csv("data/calif_penn_2011.csv")
 ```
 
@@ -57,16 +57,22 @@ f. Are your answers in (c) and (e) compatible? Explain.
 **解**：
 ```{r}
 ggplot(data=ca_pa1)+
-  geom_point(aes(x=Built_2005_or_later,y=Median_house_value))
+  geom_point(aes(x=Built_2005_or_later,y=Median_house_value),size=0.3)
 ```
 
 b. Make a new plot, or pair of plots, which breaks this out by state.  Note that the state is recorded in the `STATEFP` variable, with California being state 6 and Pennsylvania state 42.
 
 **解**：
+首先根据州的代号("06","42")新建变量statename存储州的名字("California","Pennsyvania")。
+```{r}
+ca_pa1$statename<-factor(ca_pa1$STATEFP,labels=c("California","Pennsyvania"))
+```
+
+之后根据新的变量statename进行分面。
 ```{r}
 ggplot(data=ca_pa1)+
-  geom_point(aes(x=Built_2005_or_later,y=Median_house_value))+
-  facet_wrap(~STATEFP)
+  geom_point(aes(x=Built_2005_or_later,y=Median_house_value),size=0.3)+
+  facet_wrap(~statename)
 ```
 
 3. _Nobody Home_  
@@ -85,9 +91,8 @@ b. Plot the vacancy rate against median house value.
 
 **解**：
 ```{r}
-
 ggplot(data=ca_pa2)+
-  geom_point(aes(x=Median_house_value,y=Vacancy_rates))
+  geom_point(aes(x=Median_house_value,y=Vacancy_rates),size=0.3)
 ```
 
 c. Plot vacancy rate against median house value separately for California and for Pennsylvania.  Is there a difference?
@@ -95,31 +100,103 @@ c. Plot vacancy rate against median house value separately for California and fo
 **解**：
 ```{r}
 ggplot(data=ca_pa2)+
-  geom_point(aes(x=Median_house_value,y=Vacancy_rates))+
-  facet_wrap(~STATEFP)
+  geom_point(aes(x=Median_house_value,y=Vacancy_rates),size=0.3)+
+  facet_wrap(~statename)
 ```
     
 4. The column `COUNTYFP` contains a numerical code for counties within each state.  We are interested in Alameda County (county 1 in California), Santa Clara (county 85 in California), and Allegheny County (county 3 in Pennsylvania).
-    a. Explain what the block of code at the end of this question is supposed to accomplish, and how it does it.
-    b. Give a single line of R which gives the same final answer as the block of code.  Note: there are at least two ways to do this; you just have to find one.
-    c. For Alameda, Santa Clara and Allegheny Counties, what were the average percentages of housing built since 2005?
-    d. The `cor` function calculates the correlation coefficient between two variables.  What is the correlation between median house value and the percent of housing built since 2005 in (i) the whole data, (ii) all of California, (iii) all of Pennsylvania, (iv) Alameda County, (v) Santa Clara County and (vi) Allegheny County?
-    e. Make three plots, showing median house values against median income, for Alameda, Santa Clara, and Allegheny Counties.  (If you can fit the information into one plot, clearly distinguishing the three counties, that's OK too.)
-```{r, eval=FALSE}
+a. Explain what the block of code at the end of this question is supposed to accomplish, and how it does it.
+
+```{r}
 acca <- c()
-for (tract in 1:nrow(ca_pa)) {
-  if (ca_pa$STATEFP[tract] == 6) {
-    if (ca_pa$COUNTYFP[tract] == 1) {
+for (tract in 1:nrow(ca_pa2)) {
+  if (ca_pa2$STATEFP[tract] == "06") {
+    if (ca_pa2$COUNTYFP[tract] == "001") {
       acca <- c(acca, tract)
     }
   }
 }
 accamhv <- c()
 for (tract in acca) {
-  accamhv <- c(accamhv, ca_pa[tract,10])
+  accamhv <- c(accamhv, ca_pa2[tract,10])
 }
 median(accamhv)
 ```
+
+**解**：
+第一个循环将所有满足STATEFP=6(California)，COUNTYFP=1(Alameda County)的行存为一个向量在acca中。
+第二个循环将这些行的第十列(Median_house_value)存到一个向量accamhv中。
+最后输出accamhv这组数据的median。
+
+b. Give a single line of R which gives the same final answer as the block of code.  Note: there are at least two ways to do this; you just have to find one.
+
+**解**：
+```{r}
+median(ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="001"),10])
+```
+
+c. For Alameda, Santa Clara and Allegheny Counties, what were the average percentages of housing built since 2005?
+
+**解**：
+Alameda：
+```{r}
+mean(ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="001"),"Built_2005_or_later"])
+```
+
+Santa Clara:
+```{r}
+mean(ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="085"),"Built_2005_or_later"])
+```
+
+Allegheny Counties:
+```{r}
+mean(ca_pa2[(ca_pa2[,"STATEFP"]=="42")&(ca_pa2[,"COUNTYFP"]=="003"),"Built_2005_or_later"])
+```
+
+d. The `cor` function calculates the correlation coefficient between two variables.  What is the correlation between median house value and the percent of housing built since 2005 in (i) the whole data, (ii) all of California, (iii) all of Pennsylvania, (iv) Alameda County, (v) Santa Clara County and (vi) Allegheny County?
+
+**解**：
+\(i\)
+```{r}
+cor(ca_pa2[,"Median_house_value"],ca_pa2[,"Built_2005_or_later"])
+```
+
+\(ii\)
+```{r}
+cor(ca_pa2[(ca_pa2[,"STATEFP"]=="06"),"Median_house_value"],ca_pa2[(ca_pa2[,"STATEFP",]=="06"),"Built_2005_or_later"])
+```
+
+\(iii\)
+```{r}
+cor(ca_pa2[(ca_pa2[,"STATEFP"]=="42"),"Median_house_value"],ca_pa2[(ca_pa2[,"STATEFP",]=="42"),"Built_2005_or_later"])
+```
+
+\(iv\)
+```{r}
+cor(ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="001"),"Median_house_value"],ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="001"),"Built_2005_or_later"])
+```
+
+\(v\)
+```{r}
+cor(ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="085"),"Median_house_value"],ca_pa2[(ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="085"),"Built_2005_or_later"])
+```
+
+\(vi\)
+```{r}
+cor(ca_pa2[(ca_pa2[,"STATEFP"]=="42")&(ca_pa2[,"COUNTYFP"]=="003"),"Median_house_value"],ca_pa2[(ca_pa2[,"STATEFP"]=="42")&(ca_pa2[,"COUNTYFP"]=="003"),"Built_2005_or_later"])
+```
+
+e. Make three plots, showing median house values against median income, for Alameda, Santa Clara, and Allegheny Counties.  (If you can fit the information into one plot, clearly distinguishing the three counties, that's OK too.)
+
+**解**：
+```{r}
+temp=ca_pa2[((ca_pa2[,"STATEFP"]=="42")&(ca_pa2[,"COUNTYFP"]=="003"))|((ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="085"))|((ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="001")),]
+ggplot(data=temp)+
+  geom_point(aes(x=Median_house_value,y=Median_household_income),size=0.3)+
+  facet_wrap(vars(statename,COUNTYFP),labeller = "label_both")
+```
+
+
 
 MB.Ch1.11. Run the following code:
 ```{r}
@@ -134,7 +211,16 @@ table(gender, exclude=NULL)
 rm(gender)  # Remove gender
 ```
 Explain the output from the successive uses of table().
-     
+
+**解**：
+table函数的作用是统计频次。
+
+第一次的factor将一个向量变为了factor类型，此时的gender的数据是91个female后面跟着92个male，再加一个Levels:female,male。所以此时的table()输出为female:91，male:92。
+
+第二次的factor中用了levels这个属性，levels的作用是选择数据的部分levels为有效值，默认值是将数据的所有levels按升序排列，所以这里是将gender的levels里male放在前面，female放在后面。此时的table()输出就是male:92,female:91
+
+第三次同样用了levels，但Male并不是gender的一个level，所以gender的levels只剩一个female，所有male被丢失为NA。此时table()的输出就是Male:0,female:91。如果计算上缺省值，则table()输出为Male:0,female:91,<NA>:92。
+
 MB.Ch1.12. Write a function that calculates the proportion of values in a vector x that exceed some value cutoff.
 
 (a) Use the sequence of numbers 1, 2, . . . , 100 to check that this function gives the result that is expected.

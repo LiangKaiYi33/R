@@ -109,6 +109,7 @@ myplot<-ggplot(data=mass)+
 dev.off()
 ```
 
+geom_?()中group=?用于做分组。geom间有覆盖顺序。
 
 
 
