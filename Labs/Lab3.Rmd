@@ -1,0 +1,63 @@
+---
+title: 'Lab 3: Data Wrangling on Soccer Tournament Data'
+date: 'July 9, 2020'
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r setup, message = F, include=FALSE}
+library(tidyverse)
+```
+
+Soccer tournament data wrangling
+--------------------------
+Read the dataset of football games.
+```{r,message=F}
+d <- read_csv("../data/results.csv")
+```
+
+1. Select variables `date`, `home_team` and `away_team`.
+```{r}
+d %>% dplyr::select(date,home_team,away_team)
+```
+2. Subset games with **Brazil** as the home team.
+```{r}
+d %>% filter(home_team=="Brazil")
+```
+
+3. Choose the games that Brazil won as the home team, and select variables `date`, `away_team` and `tournament`.
+```{r}
+d %>% filter(home_team=="Brazil",home_score>away_score) %>% dplyr::select(date)
+```
+
+4. Add the difference of goals, and an indicator variable called `goleada` for when the difference of goals is large,  and select what we did only for Brazil. **Hint: use `ifelse`**.
+```{r}
+d<-d %>% mutate(goleada=abs(home_score-away_score))
+```
+
+5. What was the largest difference in goals within these games?
+```{r}
+max(d$goleada)
+```
+
+6. The top 5 goleadas?
+```{r}
+head((d %>% arrange(desc(goleada)))$goleada,5)
+```
+7. Summary on goals scored by home teams, such as `mean` of `home_score` and `away_score`, `std`, using `group_by` and `summarise`
+```{r}
+d1<-d %>% group_by(home_team) %>% summarize(mean_home_score=mean(home_score),mean_away_score=mean(away_score))
+d1
+```
+
+8. Proportion of victories of **Brazil** on different tournaments against each opponent, for instance, **Argentina**.
+```{r}
+d2<-d %>% filter((home_team=="Brazil"&away_team=="Argentina")|(home_team=="Argentina"&away_team=="Brazil")) %>%
+  group_by(tournament) %>%
+  mutate(Brazilwin=(home_team=="Brazil"&home_score>away_score)|(away_team=="Brazil"&away_score>home_score)) %>%
+  summarize(Brazilwinrate=sum(Brazilwin)/length(Brazilwin))
+d2
+```
+
+
+

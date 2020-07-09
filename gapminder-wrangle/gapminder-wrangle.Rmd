@@ -75,7 +75,7 @@ ggplot(data=gap1,aes(x=year,y=cont_pop))+
 ```
 
 
-array():排序,arrange(desc())是倒叙
+arrange():排序,arrange(desc())是倒叙
 ```{r}
 gap1 %>%arrange(year)
 ```
@@ -88,8 +88,67 @@ gapminder %>% filter(continent=="Asia") %>% group_by(year) %>% summarize(maxlife
 
 
 
+```{r, message=F}
+gap_wide<-readr::read_csv("../data/gapminder_wide.csv")
+gapminder<-readr::read_csv("../data/gapminder.csv")
+```
+gather中的参数只是命名
 ```{r}
+gap_long<-gap_wide %>% gather(key=obstype_year,value=obs_values)
+head(gap_long)
+tail(gap_long)
+```
 
+添加参数确定对哪些值进行变化
+```{r}
+gap_long<-gap_wide %>% 
+  gather(key=obstype_year,value=obs_value,
+         dplyr::starts_with("pop"),
+         dplyr::starts_with("lifeExp"),
+         dplyr::starts_with("gdpPercap"))
+head(gap_long)
+tail(gap_long)
+```
+
+用"-"符号减掉不做变化的列也是同样的效果
+```{r}
+gap_long<-gap_wide %>% 
+  gather(key=obstype_year,value=obs_value,-continent,-country)
+```
+
+用separate()函数对一列的数据进行二维化处理
+```{r}
+gap_long1<-gap_long %>% separate(obstype_year,into=c("obs_type","year"),sep="_",convert=TRUE)
+head(gap_long1)
+tail(gap_long1)
+canada_df<-gap_long1 %>% filter(obs_type=="lifeExp",country=="Canada")
+ggplot(canada_df,aes(x=year,y=obs_value))+
+  geom_line()
+life_df<-gap_long1 %>% filter(obs_type=="lifeExp",continent=="Americas")
+ggplot(life_df,aes(x=year,y=obs_value,color=country))+
+  geom_line()
+```
+
+spread()函数用于将长数据变为宽数据
+```{r}
+gap_normal<-gap_long1 %>% spread(obs_type,obs_value)
+head(gap_normal)
+head(gapminder)
+```
+
+bins参数是决定分为几簇
+```{r}
+gapminder %>% filter(year=="2007") %>%
+  ggplot(aes(x=gdpPercap))+
+  geom_histogram(bins=25)+
+  scale_x_log10()
+
+library(ggrepel)
+gapminder %>% filter(year=="2007") %>%
+  ggplot(aes(x=gdpPercap,y=lifeExp))+
+  geom_point(color="red")+scale_x_log10()+
+  geom_text_repel(aes(label=country),size=2)+
+  theme_classic()
 ```
 
 
