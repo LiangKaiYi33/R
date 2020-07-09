@@ -1,0 +1,107 @@
+---
+title: "gapminder-wrangle"
+author: "梁凯毅"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+##Learn "dplyr" using gapminder dataset
+
+readr::read_csv()前面是包，后面是函数。view打开一个table查看全部数据。
+
+```{r}
+gapminder<-read_csv("../data/gapminder.csv")
+view(gapminder)
+head(gapminder,10)
+tail(gapminder)
+str(gapminder)
+```
+
+dplyr函数：filter()选行，select()选列，mutate()生成新变量，summarise()综合数据，arrange()重排。在这些函数中调用时不需要引号和$符号。
+
+filter()：take 1.data 2.logical expressions and return the TRUE rows.
+```{r}
+filter(gapminder,lifeExp<29)
+filter(gapminder,country=="China")
+filter(gapminder,country %in% c("Mexico","Peru"))
+filter(gapminder,country=="Mexico",year==2002)
+mean(filter(gapminder,country=="Brazil",year>=1987,year<=2007)$lifeExp)
+```
+
+select():select multiple columns.（这个函数会有冲突，所以用dplyr::select()）。可以用"-"来删去columns
+```{r}
+dplyr::select(gapminder,year,country,lifeExp)
+dplyr::select(gapminder,-continent,-lifeExp)
+```
+
+```{r}
+gap_cambodia<-filter(gapminder,country=="Cambodia")
+gap_combodia<-dplyr::select(gap_cambodia,-continent,-lifeExp)
+gap_combodia
+```
+
+pipe %>% operator：传递数据，可以连续使用.
+```{r}
+gapminder%>%head(3)
+gap_cambodia<-gapminder %>% filter(country=="Cambodia") %>%
+  dplyr::select(-continent,-lifeExp)
+gap_combodia
+```
+
+mutate():添加新的列。
+function in mutate: + , - , * , / , %/% , %% , log() , log2() ,log10() , lead() , lag()....
+```{r}
+gapminder %>% mutate(gdp = pop*gdpPercap)
+gapminder %>% filter(continent=="Asia",year==2007) %>% mutate(pop1000 = pop/1000)
+```
+
+group_by():分组
+```{r}
+gapminder %>% filter(year==2002) %>% group_by(continent) %>% mutate(cont_pop=sum(pop))
+```
+
+summarize():合并？
+ungroup():去除group()的效果，但这里已经summarize了, ungroup似乎没有起到效果？
+可以非常有效的用在Homework2中。
+```{r}
+gapminder %>% group_by(continent) %>% summarise(cont_pop = sum(pop)) %>% ungroup()
+gap1<-gapminder %>% group_by(continent,year) %>% summarise(cont_pop = sum(pop))
+ggplot(data=gap1,aes(x=year,y=cont_pop))+
+  geom_line(aes(color=continent))
+```
+
+
+array():排序,arrange(desc())是倒叙
+```{r}
+gap1 %>%arrange(year)
+```
+
+```{r}
+gap2<-gapminder %>% group_by(continent,year) %>% mutate(GDP = pop*gdpPercap) %>% summarize(contgdp = sum(GDP)) 
+max(gap2$contgdp)
+gapminder %>% filter(continent=="Asia") %>% group_by(year) %>% summarize(maxlife = max(lifeExp)) %>% arrange(desc(year))
+```
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
