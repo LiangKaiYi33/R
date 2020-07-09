@@ -198,9 +198,22 @@ e. Make three plots, showing median house values against median income, for Alam
 **解**：
 ```{r}
 temp=ca_pa2[((ca_pa2[,"STATEFP"]=="42")&(ca_pa2[,"COUNTYFP"]=="003"))|((ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="085"))|((ca_pa2[,"STATEFP"]=="06")&(ca_pa2[,"COUNTYFP"]=="001")),]
+v<-c()
+for(i in 1:dim(temp)[[1]]){
+  if(temp[i,"STATEFP"]=="06"&temp[i,"COUNTYFP"]=="001"){
+    v<-c(v,"Alameda")
+  }
+  if(temp[i,"STATEFP"]=="06"&temp[i,"COUNTYFP"]=="085"){
+    v<-c(v,"Santa Clara")
+  }
+  if(temp[i,"STATEFP"]=="42"&temp[i,"COUNTYFP"]=="003"){
+    v<-c(v,"Allegheny")
+  }
+}
+temp<-temp %>% mutate(countyname=v)
 ggplot(data=temp)+
   geom_point(aes(x=Median_house_value,y=Median_household_income),size=0.3)+
-  facet_wrap(vars(statename,COUNTYFP),labeller = "label_both")
+  facet_wrap("countyname")
 ```
 
 
