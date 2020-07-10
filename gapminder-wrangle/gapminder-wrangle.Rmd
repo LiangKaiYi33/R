@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-##Learn "dplyr" using gapminder dataset
+#利用"dplyr"进行数据操作
 
 readr::read_csv()前面是包，后面是函数。view打开一个table查看全部数据。
 
@@ -87,6 +87,7 @@ gapminder %>% filter(continent=="Asia") %>% group_by(year) %>% summarize(maxlife
 ```
 
 
+#数据结构转化：
 
 ```{r, message=F}
 gap_wide<-readr::read_csv("../data/gapminder_wide.csv")
@@ -150,6 +151,8 @@ gapminder %>% filter(year=="2007") %>%
   geom_text_repel(aes(label=country),size=2)+
   theme_classic()
 ```
+
+ggplot2中可以使用中文，library(showtex)即可
 
 
 
