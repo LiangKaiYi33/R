@@ -1,13 +1,9 @@
 ---
-title: 'Lab 5: Planning Production Continued'
-date: 'July 11, 2020'
+title: 'Lab 4: 10 July, 2020'
 output:
   pdf_document: default
   html_document: default
 ---
-```{r setup, message = F, include=FALSE}
-library(tidyverse)
-```
 
 Reproducibility and Functions
 ==========================================
@@ -46,7 +42,7 @@ factory.function <- function (cars.output=30, trucks.output=20) {
      output <- output * (1+runif(length(output),min=-0.1,max=0.1))
   }
 
-  return(list(output=output,pass=passes,))
+  return(list(output=output,pass=passes))
 }
 ```
 
@@ -59,8 +55,6 @@ factory.function()
 to obtain a default output value, starting from a very low initial planned output. What is the final output capacity obtained?
 
 6. Repeat this four more times to obtain new output values. Do these answers differ from each other? If so why? If not, why not?
-
-不一样，因为用了runif，产生的是随机变量。
 
 7. Right now, the number of `passes` is a value held within the function itself and not shared. Change the code so that the number of `passes` will be returned at the end of the function, as well as the final `output`.
 

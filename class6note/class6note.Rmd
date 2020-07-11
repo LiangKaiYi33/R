@@ -1,0 +1,86 @@
+---
+title: "clsaa6note"
+author: "梁凯毅"
+output: html_document
+---
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r message = F, out.width = '250px'}
+library(tidyverse)
+library(MASS)
+data(birthwt)
+summary(birthwt)
+```
+
+改名字，让名字有点意义
+```{r}
+colnames(birthwt)
+colnames(birthwt) <- c("birthwt.below.2500", "mother.age", 
+                       "mother.weight", "race",
+                       "mother.smokes", "previous.prem.labor", 
+                       "hypertension", "uterine.irr",
+                       "physician.visits", "birthwt.grams")
+```
+
+更改名字，一定要按顺序！按照元素默认的顺序进行赋值。在赋值时要将(0,1)变成(1,2)好对应赋值，也许(0,1)会当(FALSE,TRUE)处理？
+```{r}
+birthwt
+birthwt$race <- factor(c("white", "black", "other")[birthwt$race])
+birthwt$mother.smokes <- factor(c("No", "Yes")[birthwt$mother.smokes + 1])
+birthwt$uterine.irr <- factor(c("No", "Yes")[birthwt$uterine.irr + 1])
+birthwt$hypertension <- factor(c("No", "Yes")[birthwt$hypertension + 1])
+birthwt
+```
+
+```{r, dpi=300, fig.width=12, fig.height=7}
+birthwt %>% ggplot(aes(x = race))+
+  geom_bar()+
+  labs(title = "Count of Mother's Race in Springfield MA, 1986")
+```
+
+```{r, dpi=300, fig.width=12, fig.height=7}
+birthwt %>% ggplot(aes(x = mother.age))+
+  geom_histogram(bins=25)+
+  labs(x = 'number', title = "Mother's Ages in Springfield MA, 1986")
+```
+
+```{r, dpi=300, fig.width=12, fig.height=7}
+birthwt %>% ggplot(aes(x = mother.age, y = birthwt.grams))+
+  geom_point()+
+  labs(title = "Birth Weight by Mother's Age in Springfield MA, 1986")
+```
+
+```{r, dpi=300, fig.width=12, fig.height=6}
+birthwt %>% ggplot(aes(x = mother.smokes, y = birthwt.grams))+  
+  geom_boxplot()+
+  labs(title = "Birth Weight by Mother's Smoking Habit", y = "Birth Weight (g)", x="Mother Smokes")
+```
+
+
+t检验，这是个啥？假设检验？
+```{r}
+t.test (birthwt$birthwt.grams[birthwt$mother.smokes == "Yes"], 
+        birthwt$birthwt.grams[birthwt$mother.smokes == "No"])
+```
+
+
+```{r}
+linear.model.1 <- lm (birthwt.grams ~ mother.smokes, data=birthwt)
+summary(linear.model.1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
