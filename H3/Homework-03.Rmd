@@ -53,11 +53,11 @@ options(warn=-1)
 **解**：
 ```{r}
 gmp %>% ggplot()+
-  geom_point(aes(x=pop,y=pcgmp),col = "black")+
-  labs(x="Population",y="Per-Capita Economic Output ($/persion-year)",title = "US Metropolitan Area 2006")+
-  geom_line(aes(x=pop,y=6611*(gmp/pcgmp)^(1/8),color="blue"),size=1.5)+
-  geom_line(aes(x=pop,y=6611*(gmp/pcgmp)^(0.1),color="red"),size=1.5)+
-  geom_line(aes(x=pop,y=6611*(gmp/pcgmp)^(0.15),color="yellow"),size=1.5)+
+  geom_point(aes(x=log(pop),y=pcgmp),col = "black",log="y")+
+  labs(x="Population:log(pop)",y="Per-Capita Economic Output ($/persion-year)",title = "US Metropolitan Area 2006")+
+  geom_line(aes(x=log(pop),y=6611*(gmp/pcgmp)^(1/8),color="blue"),size=1.5)+
+  geom_line(aes(x=log(pop),y=6611*(gmp/pcgmp)^(0.1),color="red"),size=1.5)+
+  geom_line(aes(x=log(pop),y=6611*(gmp/pcgmp)^(0.15),color="yellow"),size=1.5)+
   scale_color_manual(name = "group",
                      values = c('blue' = 'blue', "red" = 'red','yellow'='yellow'), 
                      breaks = c("blue","red","yellow" ),
@@ -206,9 +206,10 @@ gmp2013$year<-c(rep("2013",dim(gmp2013)[1]))
 gmp2013$Y<-6611*(gmp2013$gmp/gmp2013$pcgmp)^0.1437
 gmpall<-rbind(gmp %>% select(pcgmp,pop,year,Y),gmp2013 %>% select(pcgmp,pop,year,Y))
 gmpall %>% ggplot()+
-  geom_point(aes(x=pop,y=pcgmp),col = "black")+
-  geom_line(aes(x=pop,y=Y,color="blue"),size=1.5)+
-  facet_wrap(~year)
+  geom_point(aes(x=log(pop),y=pcgmp),col = "black")+
+  geom_line(aes(x=log(pop),y=Y),col="red",size=1.5)+
+  facet_wrap(~year)+
+  labs(x="Population:log(pop)",y="Per-Capita Economic Output ($/persion-year)",title = "US Metropolitan Area 2006 vs 2013")
 ```
 
 
