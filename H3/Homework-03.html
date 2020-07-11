@@ -1811,13 +1811,13 @@ print(SE_Jack)</code></pre>
     y0jack&lt;-c(y0jack,plmjack[1])
     ajack&lt;-c(ajack,plmjack[2])
   }
-  y0_Jack&lt;-sqrt((dim(gmp)[1]-1)*sd(y0jack)^2)
-  a_Jack&lt;-sqrt((dim(gmp)[1]-1)*sd(ajack)^2)
+  y0_Jack&lt;-(dim(gmp)[1]-1)*sd(y0jack)/sqrt(dim(gmp)[1])
+  a_Jack&lt;-(dim(gmp)[1]-1)*sd(ajack)/sqrt(dim(gmp)[1])
   return(c(y0_Jack,a_Jack))
 }</code></pre>
 <pre class="r"><code>result3&lt;-plm.jackknife(6611,0.15)
 print(paste(&quot;SE:y0:&quot;,result3[1],&quot;,a:&quot;,result3[2]))</code></pre>
-<pre><code>## [1] &quot;SE:y0: 1.21874172812807e-08 ,a: 0.000991813074928269&quot;</code></pre>
+<pre><code>## [1] &quot;SE:y0: 1.21707564159639e-08 ,a: 0.000990457212264387&quot;</code></pre>
 <ol start="9" style="list-style-type: decimal">
 <li>The file <code>gmp-2013.dat</code> contains measurements for for 2013. Load it, and use <code>plm()</code> and <code>plm.jackknife</code> to estimate the parameters of the model for 2013, and their standard errors. Have the parameters of the model changed significantly?</li>
 </ol>
@@ -1829,7 +1829,7 @@ print(paste(&quot;result:y0=&quot;,result2013[1],&quot;,a=&quot;,result2013[2],&
 <pre><code>## [1] &quot;result:y0= 6610.99999993547 ,a= 0.14336878471236 ,MSE= 135210524.492827&quot;</code></pre>
 <pre class="r"><code>se2013&lt;-plm.jackknife(6611,0.15,N=gmp2013$pop,Y=gmp2013$pcgmp)
 print(paste(&quot;SE:y0:&quot;,se2013[1],&quot;,a:&quot;,se2013[2]))</code></pre>
-<pre><code>## [1] &quot;SE:y0: 1.33945766357472e-08 ,a: 0.00109247901599176&quot;</code></pre>
+<pre><code>## [1] &quot;SE:y0: 1.33762655176364e-08 ,a: 0.00109098553748628&quot;</code></pre>
 <p>和之前的数据相比，<span class="math inline">\(y_0\)</span>的变化并不明显，仍然很接近6611，但<span class="math inline">\(a\)</span>发生了比较大的变化，从之前的0.1263变为了0.1437。两组数据的对比图见下面(scale相同)。</p>
 <pre class="r"><code>gmp$year&lt;-c(rep(&quot;2006&quot;,dim(gmp)[1]))
 gmp$Y&lt;-6611*(gmp$gmp/gmp$pcgmp)^0.1263

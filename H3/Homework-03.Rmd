@@ -173,8 +173,8 @@ plm.jackknife<-function(y0,a,N=gmp$pop,Y=gmp$pcgmp){
     y0jack<-c(y0jack,plmjack[1])
     ajack<-c(ajack,plmjack[2])
   }
-  y0_Jack<-sqrt((dim(gmp)[1]-1)*sd(y0jack)^2)
-  a_Jack<-sqrt((dim(gmp)[1]-1)*sd(ajack)^2)
+  y0_Jack<-(dim(gmp)[1]-1)*sd(y0jack)/sqrt(dim(gmp)[1])
+  a_Jack<-(dim(gmp)[1]-1)*sd(ajack)/sqrt(dim(gmp)[1])
   return(c(y0_Jack,a_Jack))
 }
 ```
