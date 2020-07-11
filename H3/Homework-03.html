@@ -1650,13 +1650,13 @@ summary {
 <p>Because the model is nonlinear, there is no simple formula for the parameter estimates in terms of the data. Also unlike linear models, there is no simple formula for the <em>standard errors</em> of the parameter estimates. We will therefore use a technique called <strong>the jackknife</strong> to get approximate standard errors.</p>
 <p>Here is how the jackknife works:</p>
 <ul>
-<li>Get a set of <span class="math inline">\(n\)</span> data points and get an estimate <span class="math inline">\(\hat{\theta}\)</span> for the parameter of interest <span class="math inline">\(\theta\)</span>.</li>
-<li>For each data point <span class="math inline">\(i\)</span>, remove <span class="math inline">\(i\)</span> from the data set, and get an estimate <span class="math inline">\(\hat{\theta}_{(-i)}\)</span> from the remaining <span class="math inline">\(n-1\)</span> data points. The <span class="math inline">\(\hat{\theta}_{(-i)}\)</span> are sometimes called the “jackknife estimates”.</li>
-<li>Find the mean <span class="math inline">\(\overline{\theta}\)</span> of the <span class="math inline">\(n\)</span> values of <span class="math inline">\(\hat{\theta}_{(-i)}\)</span></li>
-<li>The jackknife variance of <span class="math inline">\(\hat{\theta}\)</span> is <span class="math display">\[
+<li><p>Get a set of <span class="math inline">\(n\)</span> data points and get an estimate <span class="math inline">\(\hat{\theta}\)</span> for the parameter of interest <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p>For each data point <span class="math inline">\(i\)</span>, remove <span class="math inline">\(i\)</span> from the data set, and get an estimate <span class="math inline">\(\hat{\theta}_{(-i)}\)</span> from the remaining <span class="math inline">\(n-1\)</span> data points. The <span class="math inline">\(\hat{\theta}_{(-i)}\)</span> are sometimes called the “jackknife estimates”.</p></li>
+<li><p>Find the mean <span class="math inline">\(\overline{\theta}\)</span> of the <span class="math inline">\(n\)</span> values of <span class="math inline">\(\hat{\theta}_{(-i)}\)</span></p></li>
+<li><p>The jackknife variance of <span class="math inline">\(\hat{\theta}\)</span> is <span class="math display">\[
 \frac{n-1}{n}\sum_{i=1}^{n}{(\hat{\theta}_{(-i)} - \overline{\theta})^2} = \frac{(n-1)^2}{n}\mathrm{var}{[\hat{\theta}_{(-i)}]}
-\]</span> where <span class="math inline">\(\mathrm{var}\)</span> stands for the sample variance. (<em>Challenge</em>: can you explain the factor of <span class="math inline">\((n-1)^2/n\)</span>? <em>Hint</em>: think about what happens when <span class="math inline">\(n\)</span> is large so <span class="math inline">\((n-1)/n \approx 1\)</span>.)</li>
-<li>The jackknife standard error of <span class="math inline">\(\hat{\theta}\)</span> is the square root of the jackknife variance.</li>
+\]</span> where <span class="math inline">\(\mathrm{var}\)</span> stands for the sample variance. (<em>Challenge</em>: can you explain the factor of <span class="math inline">\((n-1)^2/n\)</span>? <em>Hint</em>: think about what happens when <span class="math inline">\(n\)</span> is large so <span class="math inline">\((n-1)/n \approx 1\)</span>.)</p></li>
+<li><p>The jackknife standard error of <span class="math inline">\(\hat{\theta}\)</span> is the square root of the jackknife variance.</p></li>
 </ul>
 <p>You will estimate the power-law scaling model, and its uncertainty, using the data alluded to in lecture, available in the file <code>gmp.dat</code> from lecture, which contains data for 2006.</p>
 <pre class="r"><code>gmp &lt;- read.table(&quot;../data/gmp.dat&quot;)
@@ -1795,10 +1795,10 @@ print(SE)</code></pre>
 <li>Using the vector <code>jackknifed.means</code>, calculate the jack-knife approximation to the standard error of the mean. How well does it match your answer from part (a)?</li>
 </ol>
 <p><strong>解</strong>：</p>
-<pre class="r"><code>SE_Jack&lt;-sqrt((dim(gmp)[1]-1)*sd(jackknifed.means)^2)
+<pre class="r"><code>SE_Jack&lt;-(dim(gmp)[1]-1)*sd(jackknifed.means)/sqrt(dim(gmp)[1])
 print(SE_Jack)</code></pre>
-<pre><code>## [1] 482.5792</code></pre>
-<p>在(a)中的结果是481.9195，这里用Jack-knife法得到的standard error是482.5792，相差很小。</p>
+<pre><code>## [1] 481.9195</code></pre>
+<p>在(a)中的结果是481.9195，这里用Jack-knife法得到的standard error与之相同。</p>
 <ol start="8" style="list-style-type: decimal">
 <li>Write a function, <code>plm.jackknife()</code>, to calculate jackknife standard errors for the parameters <span class="math inline">\(y_0\)</span> and <span class="math inline">\(a\)</span>. It should take the same arguments as <code>plm()</code>, and return standard errors for both parameters. This function should call your <code>plm()</code> function repeatedly. What standard errors do you get for the two parameters?</li>
 </ol>

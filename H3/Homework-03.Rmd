@@ -38,6 +38,7 @@ Here is how the jackknife works:
   \frac{n-1}{n}\sum_{i=1}^{n}{(\hat{\theta}_{(-i)} - \overline{\theta})^2} = \frac{(n-1)^2}{n}\mathrm{var}{[\hat{\theta}_{(-i)}]}
   \]
 where $\mathrm{var}$ stands for the sample variance.  (_Challenge_: can you explain the factor of $(n-1)^2/n$?  _Hint_: think about what happens when $n$ is large so $(n-1)/n \approx 1$.)
+
 * The jackknife standard error of $\hat{\theta}$ is the square root of the jackknife variance.
   
 You will estimate the power-law scaling model, and its uncertainty, using the data alluded to in lecture, available in the file `gmp.dat` from lecture, which contains data for 2006.
@@ -154,11 +155,11 @@ d. Using the vector `jackknifed.means`, calculate the jack-knife approximation t
 
 **解**：
 ```{r}
-SE_Jack<-sqrt((dim(gmp)[1]-1)*sd(jackknifed.means)^2)
+SE_Jack<-(dim(gmp)[1]-1)*sd(jackknifed.means)/sqrt(dim(gmp)[1])
 print(SE_Jack)
 ```
 
-在(a)中的结果是481.9195，这里用Jack-knife法得到的standard error是482.5792，相差很小。
+在(a)中的结果是481.9195，这里用Jack-knife法得到的standard error与之相同。
 
 8. Write a function, `plm.jackknife()`, to calculate jackknife standard errors for the parameters $y_0$ and $a$.  It should take the same arguments as `plm()`, and return standard errors for both parameters.  This function should call your `plm()` function repeatedly.  What standard errors do you get for the two parameters?
 
