@@ -1,5 +1,6 @@
 ---
 title: 'Homework 4: Diffusion of Tetracycline'
+authorl: "梁凯毅 3170104603"
 output:
   html_document:
     df_print: paged
@@ -18,7 +19,7 @@ ckm_nodes<-read_csv("../data/ckm_nodes.csv")
 vec1<-which(ckm_nodes$adoption_date!="NA")
 ckm_nodes<-ckm_nodes[vec1,]
 ckm_network<-read.table("../data/ckm_network.dat")
-ckm_network<-ckm_network[vec1,] %>% select(vec1)
+ckm_network<-ckm_network[vec1,vec1]
 ```
 
 2. Create a new data frame which records, for every doctor, for every month, whether that doctor began prescribing tetracycline that month, whether they had adopted tetracycline before that month, the number of their contacts who began prescribing strictly _before_ that month, and the number of their contacts who began prescribing in that month or earlier.  Explain why the dataframe should have 6 columns, and 2125 rows.  Try not to use any loops.
@@ -43,6 +44,7 @@ newckm<-newckm %>% group_by(doctor,month) %>%
                           (ckm_nodes$adoption_date<=month))) %>%
     ungroup()
 newckm
+max(newckm$constrbefore)
 ```
 有215个doctor和17个month所以总计$215*17=2125$行，并且为了使每一行对应一个doctor的一个month，所以需要有两列分别为doctor和month以不同的顺序重复，这也有利于后序列的计算。
 

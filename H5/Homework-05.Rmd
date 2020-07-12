@@ -1,7 +1,14 @@
 ---
-title: "Homework 5: Pareto and Kuznets on the Grand Tour"
-output: pdf_document
+title: 'Homework 5: Pareto and Kuznets on the Grand Tour'
+author: "梁凯毅3170104603"
+output:
+  html_document:
+    df_print: paged
 ---
+```{r setup, message = F, include=FALSE}
+library(tidyverse)
+options(warn=-1)
+```
 
 We continue working with the World Top Incomes Database [https://wid.world], and the Pareto distribution, as in the lab.  We also continue to practice working with data frames, manipulating data from one format to another, and writing functions to automate repetitive tasks.
 
@@ -21,6 +28,12 @@ a = 1 - \frac{\log{10}}{\log{(P99/P99.9)}} ~,
 
 Because of measurement error and sampling noise, we can't find find one value of $a$ which will work for all three equations \eqref{eqn:1percent-vs-0.1-percent}--\eqref{eqn:1percent-vs-0.5-percent}.  Generally, trying to make all three equations come close to balancing gives a better estimate of $a$ than just solving one of them.  (This is analogous to finding the slope and intercept of a regression line by trying to come close to all the points in a scatterplot, and not just running a line through two of them.)
 
+```{r,message=F}
+wtidtmp<-read_csv("../data/wtid-report.csv")
+wtid<-data.frame(year=wtidtmp$Year,p99=wtidtmp$"P99 income threshold",
+                 p99.5=wtidtmp$"P99.5 income threshold",
+                 p99.9=wtidtmp$"P99.9 income threshold")
+```
 
 1. We estimate $a$ by minimizing
 \[
@@ -28,9 +41,61 @@ Because of measurement error and sampling noise, we can't find find one value of
 \]
 Write a function, `percentile_ratio_discrepancies`, which takes as inputs `P99`, `P99.5`, `P99.9` and `a`, and returns the value of the expression above.  Check that when `P99=1e6`, `P99.5=2e6`, `P99.9=1e7` and `a=2`, your function returns `0`.
 
+**解**：
+```{r}
+percentile_ratio_discrepancies<-function(a,p99,p99.5,p99.9){
+  result<-((p99/p99.9)^(1-a)-10)^2+
+    ((p99.5/p99.9)^(1-a)-5)^2+
+    ((p99/p99.5)^(1-a)-2)^2
+  return(result)
+}
+```
+```{r}
+percentile_ratio_discrepancies(2,1e6,2e6,1e7)
+```
+
 2. Write a function, `exponent.multi_ratios_est`, which takes as inputs `P99`, `P99.5`, `P99.9`, and estimates `a`.  It should minimize your `percentile_ratio_discrepancies` function.  The starting value for the minimization should come from \eqref{eqn:exponent-from-quantile-ratio}.  Check that when `P99=1e6`, `P99.5=2e6` and `P99.9=1e7`, your function returns an `a` of 2.
 
-3. Write a function which uses  `exponent.multi_ratios_est` to estimate $a$ for the US for every year from 1913 to 2012.  (There are many ways you could do thi, including loops.)  Plot the estimates; make sure the labels of the plot are appropriate.
+**解**：
+```{r}
+exponent.multi_ratios_est<-function(val){
+  p99 = val[1]
+  p99.5 = val[2]
+  p99.9 = val[3]
+  a<-1-log(10)/(log(p99)-log(p99.9))
+  result<-nlm(percentile_ratio_discrepancies,c(a),
+              p99=p99,p99.5=p99.5,p99.9=p99.9)
+  return(result$estimate)
+}
+```
+
+```{r}
+exponent.multi_ratios_est(c(1e6,2e6,1e7))
+```
+
+3. Write a function which uses  `exponent.multi_ratios_est` to estimate $a$ for the US for every year from 1913 to 2012.  (There are many ways you could do this, including loops.)  Plot the estimates; make sure the labels of the plot are appropriate.
+
+```{r}
+ass<-apply(wtid %>% select(-year),1,exponent.multi_ratios_est)
+ggplot()+
+  geom_point(aes(x=wtid$year,y=ass))
+```
 
 4. Use \eqref{eqn:exponent-from-quantile-ratio} to estimate $a$ for the US for every year.  Make a scatter-plot of these estimates against those from problem 3.  If they are identical or completely independent, something is wrong with at least one part of your code.  Otherwise, can you say anything about how the two estimates compare?
+
+**解**：
+```{r}
+ass1<-1 - log(10)/(log(wtid$p99)-log(wtid$p99.9))
+ggplot()+
+  geom_line(aes(x=wtid$year,y=ass,color="red"))+
+  geom_line(aes(x=wtid$year,y=ass1,color="blue"))+
+  scale_color_manual(name = "group",
+                     values = c("red" = "red", "blue" = 'blue'), 
+                     breaks = c("red","blue" ),
+                     labels = c("minimum-a","calculate-a"))+
+  theme(legend.title=element_blank(),
+           legend.position = c(0.9, 0.9))
+```
+
+可以看到，两条曲线非常的接近，所以用exponent-from-quantile-ratio来估计$a$就是一个很好地选择。
 
