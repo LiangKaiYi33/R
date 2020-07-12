@@ -24,10 +24,10 @@ colnames(birthwt) <- c("birthwt.below.2500", "mother.age",
                        "physician.visits", "birthwt.grams")
 ```
 
-更改名字，一定要按顺序！按照元素默认的顺序进行赋值。在赋值时要将(0,1)变成(1,2)好对应赋值，也许(0,1)会当(FALSE,TRUE)处理？
+更改名字，一定要按顺序！按照元素默认的顺序进行赋值。在赋值时要将(0,1)变成(1,2)好对应赋值，也许(0,1)会当(FALSE,TRUE)处理？以下两种factor的用法都可以。
 ```{r}
 birthwt
-birthwt$race <- factor(c("white", "black", "other")[birthwt$race])
+birthwt$race <- factor(birthwt$race,labels=c("white", "black", "other"))
 birthwt$mother.smokes <- factor(c("No", "Yes")[birthwt$mother.smokes + 1])
 birthwt$uterine.irr <- factor(c("No", "Yes")[birthwt$uterine.irr + 1])
 birthwt$hypertension <- factor(c("No", "Yes")[birthwt$hypertension + 1])
@@ -70,6 +70,115 @@ t.test (birthwt$birthwt.grams[birthwt$mother.smokes == "Yes"],
 linear.model.1 <- lm (birthwt.grams ~ mother.smokes, data=birthwt)
 summary(linear.model.1)
 ```
+
+```{r}
+linear.model.2 <- lm (birthwt.grams ~ mother.age, data=birthwt)
+```
+
+画的图应该是关于拟合结果的多种数据。发现有个严重偏离的项。
+```{r, echo=FALSE, dpi=300, fig.width=12, fig.height=9}
+par(mfrow = c(2,2))
+plot(linear.model.2)
+```
+
+```{r message = F}
+birthwt.noout <- birthwt %>% dplyr::filter(mother.age <= 40)
+linear.model.3 <- lm (birthwt.grams ~ mother.age, data=birthwt.noout)
+linear.model.3a <- lm (birthwt.grams ~ + mother.smokes + mother.age,
+                       data=birthwt.noout)
+```
+
+```{r, echo=FALSE, dpi=300, fig.width=7, fig.height=6}
+par(mfrow = c(2,2))
+plot(linear.model.3a)
+```
+
+```{r}
+linear.model.3b <- lm (birthwt.grams ~ mother.age + mother.smokes*race, data=birthwt.noout)
+summary(linear.model.3b)
+```
+
+```{r,echo=FALSE, dpi=300, fig.width=7, fig.height=6}
+par(mfrow = c(2,2))
+plot(linear.model.3b)
+```
+
+everything一起考虑：
+```{r}
+linear.model.4 <- lm (birthwt.grams ~ .-birthwt.below.2500,
+                      data=birthwt.noout)
+```
+
+```{r,  echo=FALSE, dpi=300, fig.width=7, fig.height=6}
+par(mfrow = c(2,2))
+plot(linear.model.4)
+```
+
+```{r}
+glm.0 <- glm (birthwt.below.2500 ~ . - birthwt.grams, data=birthwt.noout)
+```
+
+```{r, echo=FALSE, dpi=300, fig.width=7, fig.height=6}
+par(mfrow = c(2,2))
+plot(glm.0)
+```
+
+ 
+```{r}
+glm.1 <- glm (birthwt.below.2500 ~ . - birthwt.grams, data=birthwt.noout, family=binomial(link=logit))
+summary(glm.1)
+```
+
+```{r, echo=FALSE, dpi=300, fig.width=7, fig.height=6}
+par(mfrow = c(2,2))
+plot(glm.1)
+```
+
+
+```{r}
+odds <- seq(1, nrow(birthwt.noout), by=2)
+birthwt.in <- birthwt.noout[odds,]
+birthwt.out <- birthwt.noout[-odds,]
+linear.model.half <- lm (birthwt.grams ~ . - birthwt.below.2500, data=birthwt.in)
+summary (linear.model.half)
+```
+
+```{r}
+birthwt.predict <- predict (linear.model.half)
+cor (birthwt.in$birthwt.grams, birthwt.predict)
+```
+
+#随机数生成：
+
+set.seed设置相同种子，之后生成的随机数会完全相同。
+```{r}
+runif(1:10)
+set.seed(10)
+runif(1:10)
+```
+
+<<-是从函数内部向外界变量赋值的方法。m决定周期，当m很大时，就会像随机数。a和m要互质。
+```{r}
+seed <- 10
+new.random <- function (a=5, c=12, m=16) {
+  out <- (a*seed + c) %% m  
+  seed <<- out
+  return(out)
+}
+out.length <- 20
+variates <- rep (NA, out.length)
+for (kk in 1:out.length) variates[kk] <- new.random()
+variates
+```
+
+ecdf:经验分布函数，直观显示取值概率。
+
+hist:将数据分割，画柱状图。
+
+density:计算落在每个点小区间内的概率，可以看做hist的连续化。对每个点做
+        kernal，中心点权重高，两边权重低。
+
+
 
 
 

@@ -6,6 +6,7 @@ output:
 ---
 ```{r setup, message = F, include=FALSE}
 library(tidyverse)
+options(warn=-1)
 ```
 
 We continue examining the diffusion of tetracycline among doctors in Illinois in the early 1950s, building on our work in lab 6.  You will need the data sets `ckm_nodes.csv` and `ckm_network.dat` from the labs.
@@ -27,15 +28,19 @@ ckm_network<-ckm_network[vec1,] %>% select(vec1)
 doctor<-(rep(1:125,each=17))
 month<-(rep(1:17,125))
 newckm<-data.frame(doctor,month)
-newckm<-newckm %>% mutate(begin = (ckm_nodes$adoption_date[doctor]==month))
-newckm<-newckm %>% mutate(before = (ckm_nodes$adoption_date[doctor]<month))
+newckm<-newckm %>% mutate(begin =
+                              (ckm_nodes$adoption_date[doctor]==month))
+newckm<-newckm %>% mutate(before =
+                              (ckm_nodes$adoption_date[doctor]<month))
 newckm<-newckm %>% group_by(doctor,month) %>%
     mutate(constrbefore=
-                  sum((ckm_network[,doctor]==1)&(ckm_nodes$adoption_date<month))) %>%
+                  sum((ckm_network[,doctor]==1)&
+                          (ckm_nodes$adoption_date<month))) %>%
     ungroup()
 newckm<-newckm %>% group_by(doctor,month) %>%
     mutate(conbefore=
-                  sum((ckm_network[,doctor]==1)&(ckm_nodes$adoption_date<=month))) %>%
+                  sum((ckm_network[,doctor]==1)&
+                          (ckm_nodes$adoption_date<=month))) %>%
     ungroup()
 newckm
 ```
@@ -109,9 +114,30 @@ b. Suppose $p_k = e^{a+bk}/(1+e^{a+bk})$.  Explain, in words, what this model wo
 
 **解**：
 ```{r}
+minpk<-function(coe){
+    p_k1<-exp(coe[1]+coe[2]*psk)/(1+exp(coe[1]+coe[2]*psk))
+    return(sum((p_k1-p_k)^2)/length(psk))
+}
+```
 
+```{r,}
+p_k_fit<-nlm(minpk,c(1,0))
+print(paste("estimate:",p_k_fit$minimum))
+print(paste("a=",p_k_fit$estimate[1],",b=",p_k_fit$estimate[2]))
 ```
 
 c. Plot the values from (3b) along with the estimated curves from (4a) and (4b).  (You should have one plot, with $k$ on the horizontal axis, and probabilities on the vertical axis .)  Which model do you prefer, and why?
+
+**解**：
+```{r}
+tx<-seq(0,20,0.1)
+ggplot()+
+    geom_point(aes(x=psk,y=p_k),color="black")+
+    geom_line(aes(x=psk,y=p_k_coef[1]+p_k_coef[2]*psk),color="blue")+
+    geom_line(aes(x=tx,y=exp(p_k_fit$estimate[1]+
+                                 p_k_fit$estimate[2]*tx)/
+                (1+exp(p_k_fit$estimate[1]+p_k_fit$estimate[2]*tx)))
+              ,color="red")
+```
 
 _For quibblers, pedants, and idle hands itching for work to do_: The $p_k$ values from problem 3 aren't all equally precise, because they come from different numbers of observations.  Also, if each doctor with $k$ adoptee contacts is independently deciding whether or not to adopt with probability $p_k$, then the variance in the number of adoptees will depend on $p_k$.  Say that the actual proportion who decide to adopt is $\hat{p}_k$.  A little probability (exercise!) shows that in this situation, $\mathbb{E}[\hat{p}_k] = p_k$, but that $\mathrm{Var}[\hat{p}_k] = p_k(1-p_k)/n_k$, where $n_k$ is the number of doctors in that situation.  (We estimate probabilities more precisely when they're really extreme [close to 0 or 1], and/or we have lots of observations.)  We can estimate that variance as $\hat{V}_k = \hat{p}_k(1-\hat{p}_k)/n_k$.  Find the $\hat{V}_k$, and then re-do the estimation in (4a) and (4b) where the squared error for $p_k$ is divided by $\hat{V}_k$.  How much do the parameter estimates change?  How much do the plotted curves in (4c) change?
