@@ -78,7 +78,8 @@ exponent.multi_ratios_est(c(1e6,2e6,1e7))
 ```{r}
 ass<-apply(wtid %>% select(-year),1,exponent.multi_ratios_est)
 ggplot()+
-  geom_point(aes(x=wtid$year,y=ass))
+  geom_point(aes(x=wtid$year,y=ass))+
+  labs(x="Year",y="a")
 ```
 
 4. Use \eqref{eqn:exponent-from-quantile-ratio} to estimate $a$ for the US for every year.  Make a scatter-plot of these estimates against those from problem 3.  If they are identical or completely independent, something is wrong with at least one part of your code.  Otherwise, can you say anything about how the two estimates compare?
@@ -94,7 +95,8 @@ ggplot()+
                      breaks = c("red","blue" ),
                      labels = c("minimum-a","calculate-a"))+
   theme(legend.title=element_blank(),
-           legend.position = c(0.9, 0.9))
+           legend.position = c(0.9, 0.9))+
+  labs(x="Year",y="a")
 ```
 
 可以看到，两条曲线非常的接近，所以用exponent-from-quantile-ratio来估计$a$就是一个很好地选择。
