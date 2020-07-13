@@ -88,16 +88,10 @@ ggplot()+
 ```{r}
 ass1<-1 - log(10)/(log(wtid$p99)-log(wtid$p99.9))
 ggplot()+
-  geom_line(aes(x=wtid$year,y=ass,color="red"))+
-  geom_line(aes(x=wtid$year,y=ass1,color="blue"))+
-  scale_color_manual(name = "group",
-                     values = c("red" = "red", "blue" = 'blue'), 
-                     breaks = c("red","blue" ),
-                     labels = c("minimum-a","calculate-a"))+
-  theme(legend.title=element_blank(),
-           legend.position = c(0.9, 0.9))+
-  labs(x="Year",y="a")
+  geom_point(aes(x=ass,y=ass1),color="black")+
+  geom_line(aes(x=ass,y=ass),color="red")+
+  labs(x="minimun-a",y="calculate-a")
 ```
 
-可以看到，两条曲线非常的接近，所以用exponent-from-quantile-ratio来估计$a$就是一个很好地选择。
+可以看到，(minimum-a,calculate-a)基本都在直线calculate-a=minimum-a，所以用exponent-from-quantile-ratio来估计$a$就是一个很好地选择。
 
