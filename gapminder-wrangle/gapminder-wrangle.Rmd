@@ -154,6 +154,44 @@ gapminder %>% filter(year=="2007") %>%
 
 ggplot2中可以使用中文，library(showtex)即可
 
+```{r}
+#将其第一列的列名进行重命名，因为数据原因读入产生乱码
+colnames(data)<-c("countrycode",names(data)[2:dim(data)[2]])
+#根据数据的说明，对数据的列名进行重命名为有意义的值
+data<-dplyr::rename(data,total_employment=emp,
+                    average_hours_worked=avh,
+                    human_capital=hc,
+                    share_of_labor_income_in_GDP=labsh)
+data<-dplyr::rename(data,relative_prices_for_exports=pl_x,
+                    relative_prices_for_imports=pl_m,
+                    share_of_exports_in_GDP=csh_x,
+                    share_of_imports_in_GDP=csh_m)
+names(data)
+```
+
+```{r,message=F}
+#读入数据并删去其中
+data<-read.csv("../data/pwt91data.csv")
+data_labor<-read.dta13("../data/pwt91_labor_detail.dta")
+data_labor<-data_labor %>% dplyr::select(-i_labsh2,-i_emp,-source,
+                                         -i_labsh,-comp_sh,-lab_sh1,
+                                         -lab_sh2,-lab_sh3,-lab_sh4,
+                                         -i_comp_sh,-i_lab_sh1,
+                                         -i_lab_sh2,-i_lab_sh3,
+                                         -i_lab_sh4)
+data_labor<-dplyr::rename(data_labor,total_employment=emp,
+                          average_hours_worked=avh,
+                          share_of_labor_income_in_GDP=labsh,
+                          average_year_of_schooling=yr_sch,
+                          )
+```
+
+```{r}
+data_labor %>% dplyr::filter(countrycode=="CHN") %>% na.omit() %>%
+  ggplot()+
+  geom_point(aes(x=year,y=share_of_labor_income_in_GDP))
+```
+
 
 
 

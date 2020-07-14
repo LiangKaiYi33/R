@@ -1,0 +1,192 @@
+---
+title: "simulation"
+output: html_document
+---
+
+```{r setup, message = F, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(tidyverse)
+library(pdfetch)
+library(MASS)
+```
+
+建立随机模型，replace=T表示有放回，prob是概率比例。
+```{r}
+population.values <- 1:3
+probs <- c(5,2,3)
+my.draw <- sample (population.values, 100000, probs, replace=TRUE)
+table(my.draw)
+```
+
+replicate生成多组数据，下面是无放回的，所以相当于随机排序。
+```{r}
+sample(1:6)
+replicate(3,sample(c("Curly","Larry","Moe","Shemp")))
+```
+
+bootstrp.resample来生成重抽样(replace=T)
+```{r}
+bootstrap.resample <- function (object){
+  sample (object, length(object), replace=TRUE)}
+replicate(5, bootstrap.resample (6:10))
+```
+
+对cat数据集进行重抽样看均值差异。每次运行结果会不一样。
+```{r}
+diff.in.means <- function(df) {
+  mean(df[df$Sex=="M","Hwt"]) - mean(df[df$Sex=="F","Hwt"])
+}
+resample.diffs <- replicate(1000, 
+  diff.in.means(cats[bootstrap.resample(1:nrow(cats)),]))
+```
+
+得到的图像基本是正态的。
+```{r, dpi=300, fig.width=7, fig.height=5}
+tibble(d = resample.diffs) %>% ggplot(mapping = aes(x = d))+
+  geom_histogram(bins = 25)+
+  geom_vline(aes(xintercept = diff.in.means(cats)), col='red')
+quantile(resample.diffs,prob=c(0.025,0.975))
+qnorm(c(0.025,0.975),mean=mean(resample.diffs),
+      sd=sd(resample.diffs))
+```
+
+#Markov链
+天气与前一天的晴雨有关，但与再之前的无关，是Markov。
+```{r}
+sunny.year <- rep(NA, 365)
+sunny.year[1] <- 1
+for (day in 2:365) {
+  sunny.year[day] <- rbinom(1,1,0.2 + 0.6*sunny.year[day-1])}
+```
+
+```{r, dpi=300, fig.width=12, fig.height=7}
+tibble(x = 1:365, y = sunny.year) %>% ggplot(aes(x = x, y = y))+
+  geom_line()+
+  labs(title="Sunny Days in An Equatorial City", x="Day", y="Sunshine?")
+```
+
+若天气与之前无关，即晴雨概率相等，则有下图，明显不同。
+```{r, dpi=300, fig.width=12, fig.height=6.5}
+boring.year <- tibble(day = 1:365, rain = rbinom(365, 1, 0.5))
+boring.year %>% ggplot(aes(x = day, y = rain))+ 
+  geom_line()+
+  labs(title="Sunny Days in A Coin Flip City", x="Day", ylab="Sunshine?")
+```
+
+奇奇怪怪年，下一天和上一天相反概率大。
+```{r}
+weird.year <- rep(NA, 365)
+weird.year[1] <- 1
+transition.matrix <- matrix (c(0.2, 0.8, 0.8, 0.2), nrow=2)
+for (day in 2:365) weird.year[day] <- 
+  sample(1:2, 1, prob=transition.matrix[weird.year[day-1],])
+```
+
+```{r, dpi=300, fig.width=12, fig.height=8}
+tibble(day = 1:365, rain = weird.year) %>% 
+ggplot(aes(x = day, y = rain))+
+  geom_line()+
+  labs(title="Sunny Days in Al Gore's Nightmare", x="Day", y="Sunshine?")
+```
+
+##标准Markov函数的形式，transition.matrix是转移矩阵。
+```{r}
+rmarkovchain <- function (nn, transition.matrix, 
+    start=sample(1:nrow(transition.matrix), 1)) {
+  output <- rep (NA, nn)
+  output[1] <- start
+  for (day in 2:nn) {
+    output[day] <- 
+    sample(ncol(transition.matrix), 1, 
+           prob=transition.matrix[output[day-1],])}
+}
+```
+
+一个简单的Markov链：随机游走(output记录醉汉的位置)
+```{r}
+randomwalk <- function (nn, upprob=0.5, start=50) {
+  output <- rep (NA, nn)
+  output[1] <- start
+  for (iteration in 2:nn) 
+    output[iteration] <- 
+      output[iteration-1] + 2*rbinom(1, 1, upprob) - 1
+  output  
+}
+```
+```{r, dpi=300, fig.width=12, fig.height=8}
+tibble(x = 1:10000, y = randomwalk(10000, start=200)) %>% 
+  ggplot(aes(x, y))+ geom_line()+
+  labs(title="Simple Random Walk")
+```
+
+用随机变量计算积分，由
+
+$$\frac{1}{n}\sum_{i=1}^{n}{f(X_i)} \rightarrow \mathbb{E}_{p}[f(X)] =
+  \int{f(x) p(x) dx}$$
+  
+  若要求$\int g(x)dx$，则取$f(x)=g(x)/p(x)$。
+  
+```{r}
+x1 <- runif(300, 0, 1); y1 <- runif(300, 0, 2.6); 
+selected <- y1 < dbeta(x1, 3, 6)
+```
+
+选出来落在dbeta之内的即可估算面积。
+```{r echo=FALSE, dpi=300, fig.width=12, fig.height=6}
+plot(c(0,1), c(0,3), ty="n", main="A Sample Distribution", 
+     ylab="Density f(x)", xlab="x")
+curve (dbeta(x, 3, 6), add=TRUE)
+lines(c(0,0,1,1), c(0,3,3,0))
+points (x1, y1, col=1+1*selected, pch=16,cex=0.5)
+```
+
+利用选出的点进行分布计算。
+```{r}
+mean(selected)
+accepted.points <- x1[selected]
+mean(accepted.points < 0.5)
+pbeta(0.5, 3, 6)
+```
+
+```{r echo=FALSE, dpi=300, fig.width=12, fig.height=8}
+x2 <- runif(100000, 0, 1); y2 <- runif(100000, 0, 10); 
+selected <- y2 < dbeta(x2, 3, 6)
+plot(c(0,1), c(0,6), ty="n", main="A Sample Distribution", 
+     ylab="Density f(x)", xlab="x")
+curve (dbeta(x, 3, 6), add=TRUE)
+lines(c(0,0,1,1), c(0,3,3,0))
+points (x2, y2, col=1+1*selected, cex=0.1)
+```
+
+## Metropolis Algorithm
+```{r}
+metropolis.one <- function (xx, fun=dpois, ...) {
+  prop <- 2*rbinom(1,1,0.5) - 1 + xx#随机游动
+  acc.ratio <- fun(prop, ...)/fun(xx, ...)#fun是个函数
+  output <- if (acc.ratio > runif(1)) prop else xx
+  output
+}
+replicate (10, metropolis.one(10, lambda=5))
+```
+```{r}
+start <- 50
+draws <- rep(NA, 10000)
+for (iteration in 1:10000) {
+  start <- metropolis.one (start, lambda=10)
+  draws[iteration] <- start
+}
+```
+```{r, dpi=300, fig.width=12, fig.height=7}
+tibble(n = 1:10000, draws = draws) %>% 
+  ggplot(aes(n, draws))+ geom_point()
+```
+
+
+
+
+
+
+
+
+
+

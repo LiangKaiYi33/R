@@ -124,7 +124,7 @@ minpk<-function(coe){
 
 ```{r,}
 p_k_fit<-nlm(minpk,c(1,0))
-print(paste("estimate:",p_k_fit$minimum))
+print(paste("minimum:",p_k_fit$minimum))
 print(paste("a=",p_k_fit$estimate[1],",b=",p_k_fit$estimate[2]))
 ```
 
@@ -135,11 +135,28 @@ c. Plot the values from (3b) along with the estimated curves from (4a) and (4b).
 tx<-seq(0,20,0.1)
 ggplot()+
     geom_point(aes(x=psk,y=p_k),color="black")+
-    geom_line(aes(x=psk,y=p_k_coef[1]+p_k_coef[2]*psk),color="blue")+
+    geom_line(aes(x=psk,y=p_k_coef[1]+
+                    p_k_coef[2]*psk,color="blue"))+
     geom_line(aes(x=tx,y=exp(p_k_fit$estimate[1]+
                                  p_k_fit$estimate[2]*tx)/
-                (1+exp(p_k_fit$estimate[1]+p_k_fit$estimate[2]*tx)))
-              ,color="red")
+                (1+exp(p_k_fit$estimate[1]+
+                         p_k_fit$estimate[2]*tx)),color="red"))+
+  labs(x="k",y="p_k")+
+  scale_color_manual(name = "group",
+                     values = c( "blue" ='blue','red'='red'), 
+                     breaks = c('blue','red' ),
+                     labels = c('linear_model','exp_model'))+
+  theme(legend.title=element_blank(),
+           legend.position = c(0.9, 0.9))
 ```
 
 _For quibblers, pedants, and idle hands itching for work to do_: The $p_k$ values from problem 3 aren't all equally precise, because they come from different numbers of observations.  Also, if each doctor with $k$ adoptee contacts is independently deciding whether or not to adopt with probability $p_k$, then the variance in the number of adoptees will depend on $p_k$.  Say that the actual proportion who decide to adopt is $\hat{p}_k$.  A little probability (exercise!) shows that in this situation, $\mathbb{E}[\hat{p}_k] = p_k$, but that $\mathrm{Var}[\hat{p}_k] = p_k(1-p_k)/n_k$, where $n_k$ is the number of doctors in that situation.  (We estimate probabilities more precisely when they're really extreme [close to 0 or 1], and/or we have lots of observations.)  We can estimate that variance as $\hat{V}_k = \hat{p}_k(1-\hat{p}_k)/n_k$.  Find the $\hat{V}_k$, and then re-do the estimation in (4a) and (4b) where the squared error for $p_k$ is divided by $\hat{V}_k$.  How much do the parameter estimates change?  How much do the plotted curves in (4c) change?
+
+**解**：
+
+按照我对题目的理解（看不懂$\hat{V}_k$的含义），$\hat{p}_k$对每个$k$都是一个随机变量，均值为$p_k$，方差为$\frac{p_k(1-p_k)}{n_k}$，这是一个确定的值，所以构造squar minimum的方程时，发现为
+\[
+\sum_kE[(\hat{p}_k-f(k)^2)]=\sum_kE[(\hat{p}_k-p_k)^2]+2E[(\hat{p}_k-p_k)(p_k-f(k))]+E[(p_k-f(k))^2]=\sum_k\frac{p_k(1-p_k)}{n_k}+(p_k-f(k))^2
+\]
+这与之前的情形只相差了一个常数，所以在最优化方面与之前的结果应当完全一致。
+

@@ -1,0 +1,48 @@
+---
+title: "project"
+author: "梁凯毅3170104603"
+output: html_document
+---
+
+```{r setup, message = F, include=FALSE}
+library(tidyverse)
+library(readstata13)
+options(warn=-1)
+```
+
+#geyser数据介绍
+geyser数据集记录的是黄石公园间歇性泉喷发的数据样本，其中duration是每次喷发的时间(min)，waiting是这次喷发之前的等待时间。
+
+首先看一下duration和wating之间是否有明显的关系。
+```{r}
+ggplot(data=geyser)+
+  geom_point(aes(x=waiting,y=duration))
+```
+
+可以发现当等待时间较短时，喷发时间都比较长，而当等待时间较长时，喷发时间主要集中在两个值2,4附近。
+
+下面来考察waiting时间的分布
+```{r}
+geyser %>% ggplot(aes(x=waiting))+
+  geom_histogram(bins=50)+
+  labs(theme="waiting distribution")
+```
+
+可以看到数据具有明显的双峰性质，可以用两个正态分布的复合去逼近。我们采用极大似然的方法来拟合这一模型，用于拟合此类模型相似程度的log-似然方程(Redner and Walker, 1984; Ingrassia, 1992)为如下形式：
+\[
+L(p,\mu_1,\sigma_1,\mu_2,\sigma_2)=\sum_{i=1}^nlog[\frac{p}{\sigma_1}\Phi(\frac{y_i-\mu_1}{\sigma_1})+\frac{1-p}{\sigma_2}\Phi(\frac{y_i-\mu_2}{\sigma_2})]
+\]
+目标是优化-F使其收敛到极小值。
+
+```{r}
+geyser %>% filter(duration>=3) %>% 
+  ggplot(aes(x=waiting))+
+  geom_histogram(bins=50)
+```
+
+
+
+
+
+
+
