@@ -21,18 +21,78 @@ ggplot(data=geyser)+
 
 可以发现当等待时间较短时，喷发时间都比较长，而当等待时间较长时，喷发时间主要集中在两个值2,4附近。
 
-下面来考察waiting时间的分布
+下面来考察waiting时间的分布，将其用tidyverse进行处理以获得其waiting取每个值的概率，用geom_point汇出；再用geom_density绘制其密度分布图像。
 ```{r}
-geyser %>% ggplot(aes(x=waiting))+
-  geom_histogram(bins=50)+
+waiting_density<- geyser %>% group_by(waiting) %>%
+  summarise(density=length(waiting)/dim(geyser)[1]) %>%
+  ungroup()
+ggplot()+
+  geom_point(aes(x=waiting_density$waiting,
+                 y=waiting_density$density))+
+  geom_density(aes(x=geyser$waiting))
   labs(theme="waiting distribution")
 ```
 
 可以看到数据具有明显的双峰性质，可以用两个正态分布的复合去逼近。我们采用极大似然的方法来拟合这一模型，用于拟合此类模型相似程度的log-似然方程(Redner and Walker, 1984; Ingrassia, 1992)为如下形式：
 \[
-L(p,\mu_1,\sigma_1,\mu_2,\sigma_2)=\sum_{i=1}^nlog[\frac{p}{\sigma_1}\Phi(\frac{y_i-\mu_1}{\sigma_1})+\frac{1-p}{\sigma_2}\Phi(\frac{y_i-\mu_2}{\sigma_2})]
+L(p,\mu_1,\sigma_1,\mu_2,\sigma_2)=\sum_{i=1}^nlog[\frac{p}{\sigma_1}\phi(\frac{y_i-\mu_1}{\sigma_1})+\frac{1-p}{\sigma_2}\phi(\frac{y_i-\mu_2}{\sigma_2})]
 \]
 目标是优化-F使其收敛到极小值。
+
+```{r}
+waiting_fit<-function(coe){
+  x<-geyser$waiting
+  result<-coe[1]*dnorm((x-coe[2])/coe[3])/coe[3]+
+    (1-coe[1])*dnorm((x-coe[4])/coe[5])/coe[5]
+  if(any(result<=0))
+    return(Inf)
+  else
+    return(-sum(log(result)))
+}
+```
+
+
+```{r}
+p0<-sum((waiting_density %>%
+           filter(waiting<=65))$density)
+mu1<-52
+sig1<-5
+mu2<-78
+sig2<-5
+coe0<-c(p0,mu1,sig1,mu2,sig2)
+coe<-nlm(waiting_fit,coe0)$estimate
+coe
+```
+
+```{r}
+fit_line<-function(x,coe){
+  result<-coe[1]*dnorm(x,coe[2],coe[3])+
+    (1-coe[1])*dnorm(x,coe[4],coe[5])
+  return(result)
+}
+```
+
+```{r}
+waiting_density<- geyser %>% group_by(waiting) %>%
+  summarise(density=length(waiting)/dim(geyser)[1]) %>%
+  ungroup()
+ggplot()+
+  geom_point(aes(x=waiting_density$waiting,
+                 y=waiting_density$density))+
+  geom_density(aes(x=geyser$waiting,color="blue"))+
+  geom_line(aes(x=waiting_density$waiting,
+              y=fit_line(waiting_density$waiting,coe),
+              color="red"))+
+  labs(theme="waiting distribution")+
+  scale_color_manual(name = "group",
+                     values = c( "blue"='blue',
+                                 'red'='red'), 
+                     breaks = c('blue','red' ),
+                     labels = c('density',
+                                'fit model'))+
+  theme(legend.title=element_blank(),
+           legend.position = c(0.9, 0.9))
+```
 
 ```{r}
 geyser %>% filter(duration>=3) %>% 
