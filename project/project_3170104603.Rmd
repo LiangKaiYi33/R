@@ -1,5 +1,5 @@
 ---
-title: "project"
+title: "Project on geyser data"
 author: "梁凯毅3170104603"
 output: html_document
 ---
@@ -7,30 +7,61 @@ output: html_document
 ```{r setup, message = F, include=FALSE}
 library(tidyverse)
 library(readstata13)
+library(ggplot2)
+library(gridExtra)
+library(MASS)
 options(warn=-1)
 ```
 
-#geyser数据介绍
-geyser数据集记录的是黄石公园间歇性泉喷发的数据样本，其中duration是每次喷发的时间(min)，waiting是这次喷发之前的等待时间。
+# geyser数据集
 
-首先看一下duration和wating之间是否有明显的关系。
-```{r}
+geyser数据集是Rstudio的MASS包带有的一个数据集，其中记录的是黄石公园“Old Faithful”间歇泉
+在1985年八月1日到八月15日的间歇性泉喷发的数据，其中duration记录的是每次喷发持续的时间(min)，waiting则是这次喷发之前的等待时间(min)。
+
+首先利用ggplot2来对数据进行绘图，看一下duration和wating之间的对应情况，以及相互之间是否有明显的关系。这里采用的是geom_point并以每组数据的waiting为横坐标，以duration为纵坐标。
+```{r,echo=F}
 ggplot(data=geyser)+
-  geom_point(aes(x=waiting,y=duration))
+  geom_point(aes(x=waiting,y=duration))+
+  labs(theme="duration~waiting")
 ```
 
-可以发现当等待时间较短时，喷发时间都比较长，而当等待时间较长时，喷发时间主要集中在两个值2,4附近。
+通过上图可以发现当两次喷发间间隔时间较短时，喷发时间都比较长，集中在4~5分钟，而当等待时间较长时，喷发时间则有长有短，主要集中在两个区间1.5~2.5分钟和4~5分钟附近。
+
+# 数据分析
+
+在这部分我们来考虑waiting和duration这两个变量的分布情况，这里先用直方图进行表示。
+
+## 全体数据的waiting值
+
+对全体数据的waiting进行绘制直方图。
+```{r,echo=F}
+ggplot(data=geyser)+
+  geom_histogram(aes(x=waiting),bins=50)+
+  labs(x="all-waiting")
+```
+
+## 部分数据的waiting值
+
+根据之前的duration~waiting图，可以发现根据duration，数据大致可以分为两组，一组为duration$\geq3$的情况，另一种为duration$<$3的情况，在这里我们选取duration$\geq$3的情况进行对参数waiting的直方图绘制。在绘制图像之前需要先用dplyr::filter将符合条件的数据提取出来，这组数据称为geyser3。
+```{r,echo=F}
+geyser3<-geyser %>% filter(duration>=3)
+ggplot(data=geyser3)+
+  geom_histogram(aes(x=waiting),bins=50)+
+  labs(x="waiting:duration>=3")
+```
+
 
 下面来考察waiting时间的分布，将其用tidyverse进行处理以获得其waiting取每个值的概率，用geom_point汇出；再用geom_density绘制其密度分布图像。
-```{r}
+```{r,echo=F,message=F}
 waiting_density<- geyser %>% group_by(waiting) %>%
   summarise(density=length(waiting)/dim(geyser)[1]) %>%
   ungroup()
 ggplot()+
   geom_point(aes(x=waiting_density$waiting,
                  y=waiting_density$density))+
-  geom_density(aes(x=geyser$waiting))
-  labs(theme="waiting distribution")
+  geom_density(aes(x=geyser$waiting))+
+  labs(x="waiting time",y="density/propotion",
+       theme="waiting density")
 ```
 
 可以看到数据具有明显的双峰性质，可以用两个正态分布的复合去逼近。我们采用极大似然的方法来拟合这一模型，用于拟合此类模型相似程度的log-似然方程(Redner and Walker, 1984; Ingrassia, 1992)为如下形式：
@@ -39,9 +70,10 @@ L(p,\mu_1,\sigma_1,\mu_2,\sigma_2)=\sum_{i=1}^nlog[\frac{p}{\sigma_1}\phi(\frac{
 \]
 目标是优化-F使其收敛到极小值。
 
-```{r}
-waiting_fit<-function(coe){
-  x<-geyser$waiting
+```{r,echo=F}
+#dnorm(x,mu,sig)和dnorm((x-mu)/sig)是不同的
+#因为是密度所以相差了一个sig倍
+b_fit<-function(coe,x){
   result<-coe[1]*dnorm((x-coe[2])/coe[3])/coe[3]+
     (1-coe[1])*dnorm((x-coe[4])/coe[5])/coe[5]
   if(any(result<=0))
@@ -52,7 +84,7 @@ waiting_fit<-function(coe){
 ```
 
 
-```{r}
+```{r,echo=F}
 p0<-sum((waiting_density %>%
            filter(waiting<=65))$density)
 mu1<-52
@@ -60,11 +92,13 @@ sig1<-5
 mu2<-78
 sig2<-5
 coe0<-c(p0,mu1,sig1,mu2,sig2)
-coe<-nlm(waiting_fit,coe0)$estimate
-coe
+coe1<-nlm(b_fit,coe0,x=geyser$waiting)$estimate
 ```
 
-```{r}
+
+
+
+```{r,echo=F}
 fit_line<-function(x,coe){
   result<-coe[1]*dnorm(x,coe[2],coe[3])+
     (1-coe[1])*dnorm(x,coe[4],coe[5])
@@ -72,33 +106,111 @@ fit_line<-function(x,coe){
 }
 ```
 
-```{r}
-waiting_density<- geyser %>% group_by(waiting) %>%
-  summarise(density=length(waiting)/dim(geyser)[1]) %>%
-  ungroup()
+```{r,echo=F}
 ggplot()+
   geom_point(aes(x=waiting_density$waiting,
                  y=waiting_density$density))+
   geom_density(aes(x=geyser$waiting,color="blue"))+
   geom_line(aes(x=waiting_density$waiting,
-              y=fit_line(waiting_density$waiting,coe),
+              y=fit_line(waiting_density$waiting,coe1),
               color="red"))+
-  labs(theme="waiting distribution")+
+  labs(x="waiting time",y="density/proportion",
+       theme="waiting distribution")+
   scale_color_manual(name = "group",
                      values = c( "blue"='blue',
                                  'red'='red'), 
                      breaks = c('blue','red' ),
-                     labels = c('density',
-                                'fit model'))+
+                     labels = c('geom_density',
+                                'fitting model'))+
   theme(legend.title=element_blank(),
            legend.position = c(0.9, 0.9))
 ```
 
-```{r}
-geyser %>% filter(duration>=3) %>% 
-  ggplot(aes(x=waiting))+
-  geom_histogram(bins=50)
+```{r,echo=F}
+ggplot()+
+  geom_point(aes(x=fit_line(waiting_density$waiting,coe1),
+                 y=waiting_density$density))+
+  geom_line(aes(
+    x=fit_line(waiting_density$waiting,coe1),
+    y=fit_line(waiting_density$waiting,coe1),
+    color="red"))
 ```
+
+```{r,echo=F,message=F}
+wtds3<-geyser3 %>% group_by(waiting) %>%
+  summarize(density=length(waiting)/dim(geyser3)[1]) %>%
+  ungroup()
+ggplot()+
+  geom_point(aes(x=wtds3$waiting,y=wtds3$density))+
+  geom_density(aes(x=geyser3$waiting))
+```
+
+```{r,echo=F}
+p0=sum((wtds3 %>% filter(waiting<=66))$density)
+mu1=53
+sig1=5
+mu2=78
+sig2=5
+coe2<-nlm(b_fit,c(p0,mu1,sig1,mu2,sig2),geyser3$waiting)$estimate
+```
+
+```{r,echo=F}
+ggplot()+
+  geom_point(aes(x=wtds3$waiting,
+                 y=wtds3$density))+
+  geom_density(aes(x=geyser3$waiting,color="blue"))+
+  geom_line(aes(x=wtds3$waiting,
+              y=fit_line(wtds3$waiting,coe2),
+              color="red"))+
+  labs(x="time",y="density",theme="waiting distribution")+
+  scale_color_manual(name = "group",
+                     values = c( "blue"='blue',
+                                 'red'='red'), 
+                     breaks = c('blue','red' ),
+                     labels = c('density function',
+                                'fitting model'))+
+  theme(legend.title=element_blank(),
+           legend.position = c(0.9, 0.9))
+```
+
+```{r,echo=F}
+ggplot(data=geyser)+
+  geom_histogram(aes(duration,..density..),bins=30)+
+  geom_density(aes(duration))
+```
+
+```{r,echo=F}
+p0=length((geyser %>% filter(duration<=3))$duration)/dim(geyser)[1]
+mu1=2
+sig1=0.5
+mu2=4
+sig2=0.5
+coe3<-nlm(b_fit,c(p0,mu1,sig1,mu2,sig2),
+    x=geyser$duration)$estimate
+```
+
+```{r,echo=F}
+geyser3<-geyser %>% arrange(duration)
+ggplot(data=geyser)+
+  geom_histogram(aes(duration,..density..),bins=30)+
+  geom_density(aes(duration,color="blue"),size=1)+
+  geom_line(aes(x=seq(0.5,5.5,5/298),
+                y=fit_line(seq(0.5,5.5,5/298),coe3),
+                color="red"),size=1)+
+  labs(x="duration",y="density",
+       theme="duration distribution")+
+  scale_color_manual(name = "group",
+                     values = c( "blue"='blue',
+                                 'red'='red'), 
+                     breaks = c('blue','red' ),
+                     labels = c('density fuction',
+                                'fitting model'))+
+  theme(legend.title=element_blank(),
+           legend.position = c(0.9, 0.9))
+```
+
+
+
 
 
 
