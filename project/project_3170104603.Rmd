@@ -231,6 +231,7 @@ print(paste(" mu2:",coe2[4]," sig2:",coe2[5]))
 
 &emsp;&emsp;
 同样，将原数据，密度函数和拟合得到的图形绘制在一起进行对比。
+
 ```{r,echo=F,message=F}
 ggplot()+
   geom_histogram(aes(x=geyser3$waiting,..density..)
@@ -292,6 +293,7 @@ print(paste(" mu2:",coe3[4]," sig2:",coe3[5]))
 
 &emsp;&emsp;
 同样进行绘图。
+
 ```{r,echo=F}
 ggplot(data=geyser)+
   geom_histogram(aes(duration,..density..),bins=30,
@@ -342,7 +344,9 @@ ggplot()+
 &emsp;&emsp;
 通过以上拟合可以发现，对于一般的具有双峰性质的数据，采用双正态复合模型进行拟合可以对其分布有一个比较准确地拟合。但对一些特殊的数据，例如在duration中存在大量数据都集中在一个单一值形成了尖刺状，这种类型的数据很难被由两个正态分布符合而成的模型所描绘，所以并不能十分准确的拟合，但单从图形上看，拟合的效果比density还是要好一些。
 
+# 参考文献：
 
+[1]Modern Applied Statistics with S
 
 
 
