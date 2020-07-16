@@ -3,6 +3,20 @@ title: "Project on geyser data"
 author: "梁凯毅3170104603"
 output: html_document
 ---
+<style type="text/css">
+
+body{ /* Normal  */
+   font-size: 18px;
+}
+h1 { /* Header 1 */
+ font-size: 30px;
+ color: DarkBlue;
+}
+h2 { /* Header 2 */
+ font-size: 26px;
+ color: DarkBlue;
+}
+</style>
 
 ```{r setup, message = F, include=FALSE}
 library(tidyverse)
@@ -66,7 +80,7 @@ ggplot()+
 ## 2.部分数据的waiting值
 
 &emsp;&emsp;
-根据之前的duration~waiting图，可以发现根据duration，数据大致可以分为两组，一组为duration$\geq3$的情况，另一种为duration$<$3的情况，在这里我们选取duration$\geq$3的情况。在绘制图像之前需要先用dplyr::filter将符合条件的数据提取出来，这组数据称为geyser3。并且建立一个新的数据wtds3来存放每个waiting值得频率。结果如下图，其中黑色的线是密度函数。
+根据之前的duration~waiting图，可以发现根据duration，数据大致可以分为两组，一组为duration$\geq3$的情况，另一种为duration$<3$的情况，在这里我们选取duration$\geq3$的情况。在绘制图像之前需要先用dplyr::filter将符合条件的数据提取出来，这组数据称为geyser3。并且建立一个新的数据wtds3来存放每个waiting值得频率。结果如下图，其中黑色的线是密度函数。
 
 ```{r,echo=F,message=F}
 geyser3<-geyser %>% filter(duration>=3)
@@ -110,7 +124,7 @@ $$
 # 三.模型拟合
 
 &emsp;&emsp;
-首先建立一个计算L的函数命名为b_fit()，其第一个参数$coe$存放的是$(p,\mu_1,\sigma_1,\mu_2,\sigma_2)$，第二个参数$x$存放的就是待拟合的数据，在这里分别要使用的是是geyser\$waiting,geyser3\$waiting，geyser\$duration，返回结果是log-似然方程的相反数或Inf。
+首先建立一个计算L的函数命名为b_fit()，其第一个参数$coe$存放的是$(p,\mu_1,\sigma_1,\mu_2,\sigma_2)$，第二个参数$x$存放的就是待拟合的数据，在这里分别要使用的是是geyser\$waiting，geyser3\$waiting，geyser\$duration，返回结果是log-似然方程的相反数或Inf。
 
 ```{r}
 b_fit<-function(coe,x){
@@ -177,7 +191,7 @@ ggplot()+
 &emsp;&emsp;
 从上图可以看出双正态复合模型在分布的估计上比普通的density要好。由于不是普通的正态分布，所以没有办法直接进行Q-Q检验，需要自己计算对应每个waiting值的分位数在模型中的取值，这里采用的是下降法，通过计算模型分布函数的在每个waiting值的梯度，用下降法逼近得到模型中对应的分位数。所得的结果如下图，横坐标是模型拟合出的分位数，纵坐标是原本waiting值得分为数，从这个Q-Q图可以看出，拟合程度很好。
 
-```{r,message=F}
+```{r,message=F,echo=F}
 attach(geyser)
 pmix2 <- deriv(~ p*pnorm((x-u1)/s1) + (1-p)*pnorm((x-u2)/s2),
                "x", function(x, p, u1, s1, u2, s2) {})
@@ -217,7 +231,7 @@ print(paste(" mu2:",coe2[4]," sig2:",coe2[5]))
 
 &emsp;&emsp;
 同样，将原数据，密度函数和拟合得到的图形绘制在一起进行对比。
-```{r,echo=F}
+```{r,echo=F,message=F}
 ggplot()+
   geom_histogram(aes(x=geyser3$waiting,..density..)
                  ,fill="gray")+
@@ -235,7 +249,7 @@ ggplot()+
   theme(legend.title=element_blank(),
            legend.position = c(0.9, 0.9))
 ```
-```{r,message=F}
+```{r,message=F,echo=F}
 attach(geyser3)
 pmix2 <- deriv(~ p*pnorm((x-u1)/s1) + (1-p)*pnorm((x-u2)/s2),
                "x", function(x, p, u1, s1, u2, s2) {})
@@ -255,13 +269,14 @@ ggplot()+
   geom_line(aes(x=x1,y=x1),col="red")+
   labs(x="fitting model",y="waiting time",title="Q-Q")
 ```
+
 &emsp;&emsp;
 可以看到，在这种情况下，双正态复合模型的表现也很好。
 
 ## 3.拟合全体duration值分布
 
 &emsp;&emsp;
-取初值p为duration$\leq$3时的密度和，$\mu_1$为2，$\sigma_1$为0.5，$\mu_2$为4，$\sigma_2$为0.5，数据用geyser$duration。拟合出的参数如下。
+取初值p为duration$\leq3$时的密度和，$\mu_1$为2，$\sigma_1$为0.5，$\mu_2$为4，$\sigma_2$为0.5，数据用geyser$duration。拟合出的参数如下。
 ```{r,echo=F,message=F}
 p0=length((geyser %>% filter(duration<=3))$duration)/dim(geyser)[1]
 mu1=2
@@ -296,7 +311,7 @@ ggplot(data=geyser)+
   theme(legend.title=element_blank(),
            legend.position = c(0.9, 0.9))
 ```
-```{r,message=F}
+```{r,message=F,echo=F}
 attach(geyser)
 pmix2<-deriv(~ p*pnorm((x-u1)/s1) + (1-p)*pnorm((x-u2)/s2),
                "x", function(x, p, u1, s1, u2, s2) {})
