@@ -8,16 +8,18 @@ output: html_document
 library(tidyverse)
 library(readstata13)
 library(ggplot2)
-library(gridExtra)
+#library(gridExtra)
 library(MASS)
 options(warn=-1)
 ```
 
-# geyser数据集
+# 一.geyser数据集
 
+&emsp;&emsp;
 geyser数据集是Rstudio的MASS包带有的一个数据集，其中记录的是黄石公园“Old Faithful”间歇泉
 在1985年八月1日到八月15日的间歇性泉喷发的数据，其中duration记录的是每次喷发持续的时间(min)，waiting则是这次喷发之前的等待时间(min)。
 
+&emsp;&emsp;
 首先利用ggplot2来对数据进行绘图，看一下duration和wating之间的对应情况，以及相互之间是否有明显的关系。这里采用的是geom_point并以每组数据的waiting为横坐标，以duration为纵坐标。
 ```{r,echo=F}
 ggplot(data=geyser)+
@@ -25,54 +27,92 @@ ggplot(data=geyser)+
   labs(theme="duration~waiting")
 ```
 
-通过上图可以发现当两次喷发间间隔时间较短时，喷发时间都比较长，集中在4~5分钟，而当等待时间较长时，喷发时间则有长有短，主要集中在两个区间1.5~2.5分钟和4~5分钟附近。
+&emsp;&emsp;
+通过上图可以发现当两次喷发间间隔时间较短时，喷发时间都比较长，集中在4\~5分钟，而当等待时间较长时，喷发时间则有长有短，主要集中在两个区间1.5\~2.5分钟和4\~5分钟附近。
 
-# 数据分析
+# 二.数据分析
 
-在这部分我们来考虑waiting和duration这两个变量的分布情况，这里先用直方图进行表示。
+&emsp;&emsp;
+在这部分我们来考虑waiting和duration这两个变量各自的分布情况，这里用直方图和密度曲线来进行表示。
 
-## 全体数据的waiting值
+&emsp;&emsp;
+首先我们对数据进行一些操作。由于waiting值都是一系列的整数，所以可以比较方便的计算它每个值发生的比例，并用tidyverse中的group_by()函数和summarise()函数构建一个新的数据，将其命名为waiting_density。这样就可以和密度曲线绘制在同一个纵坐标下。
 
-对全体数据的waiting进行绘制直方图。
-```{r,echo=F}
-ggplot(data=geyser)+
-  geom_histogram(aes(x=waiting),bins=50)+
-  labs(x="all-waiting")
-```
-
-## 部分数据的waiting值
-
-根据之前的duration~waiting图，可以发现根据duration，数据大致可以分为两组，一组为duration$\geq3$的情况，另一种为duration$<$3的情况，在这里我们选取duration$\geq$3的情况进行对参数waiting的直方图绘制。在绘制图像之前需要先用dplyr::filter将符合条件的数据提取出来，这组数据称为geyser3。
-```{r,echo=F}
-geyser3<-geyser %>% filter(duration>=3)
-ggplot(data=geyser3)+
-  geom_histogram(aes(x=waiting),bins=50)+
-  labs(x="waiting:duration>=3")
-```
-
-
-下面来考察waiting时间的分布，将其用tidyverse进行处理以获得其waiting取每个值的概率，用geom_point汇出；再用geom_density绘制其密度分布图像。
+&emsp;&emsp;
+我们可以查看一下这个新建立的数据waiting_density的前面几行。
 ```{r,echo=F,message=F}
 waiting_density<- geyser %>% group_by(waiting) %>%
   summarise(density=length(waiting)/dim(geyser)[1]) %>%
   ungroup()
+head(waiting_density)
+```
+
+## 1.全体数据的waiting值
+
+&emsp;&emsp;
+这里对geyser数据的waiting值进行直方图的绘制以及每个点取值的频率和密度函数的绘制，其中密度函数可以直接用geom_density进行绘制。结果如下图，其中黑色的线是密度函数。
+
+```{r,echo=F}
+ggplot(data=geyser)+
+  geom_histogram(aes(x=waiting),bins=50)+
+  labs(x="all waiting histogram")
 ggplot()+
   geom_point(aes(x=waiting_density$waiting,
                  y=waiting_density$density))+
   geom_density(aes(x=geyser$waiting))+
-  labs(x="waiting time",y="density/propotion",
-       theme="waiting density")
+  labs(x="waiting time",y="density/propotion")
 ```
 
-可以看到数据具有明显的双峰性质，可以用两个正态分布的复合去逼近。我们采用极大似然的方法来拟合这一模型，用于拟合此类模型相似程度的log-似然方程(Redner and Walker, 1984; Ingrassia, 1992)为如下形式：
-\[
-L(p,\mu_1,\sigma_1,\mu_2,\sigma_2)=\sum_{i=1}^nlog[\frac{p}{\sigma_1}\phi(\frac{y_i-\mu_1}{\sigma_1})+\frac{1-p}{\sigma_2}\phi(\frac{y_i-\mu_2}{\sigma_2})]
-\]
-目标是优化-F使其收敛到极小值。
+## 2.部分数据的waiting值
+
+&emsp;&emsp;
+根据之前的duration~waiting图，可以发现根据duration，数据大致可以分为两组，一组为duration$\geq3$的情况，另一种为duration$<$3的情况，在这里我们选取duration$\geq$3的情况。在绘制图像之前需要先用dplyr::filter将符合条件的数据提取出来，这组数据称为geyser3。并且建立一个新的数据wtds3来存放每个waiting值得频率。结果如下图，其中黑色的线是密度函数。
+
+```{r,echo=F,message=F}
+geyser3<-geyser %>% filter(duration>=3)
+ggplot(data=geyser3)+
+  geom_histogram(aes(x=waiting),bins=50)+
+  labs(x="waiting histogram:duration>=3")
+wtds3<-geyser3 %>% group_by(waiting) %>%
+  summarize(density=length(waiting)/dim(geyser3)[1]) %>%
+  ungroup()
+ggplot()+
+  geom_point(aes(x=wtds3$waiting,y=wtds3$density))+
+  geom_density(aes(x=geyser3$waiting))+
+  labs(x="waiting",y="density/proportion")
+```
+
+## 3.全体数据的duration值
+
+&emsp;&emsp;
+由于duration值取值非常的多，所以直接计算频率会有非常多的点，所以这里只用直方图进行表示。但为了将直方图和密度曲线在同一个纵坐标下绘制出，我们需要将ggplot()中geom_histogram()的参数aes设为aes(duration,..density..)，这样绘制出的就是其在每个bin中取值的密度。结果如下图，其中黑色的线是密度函数。
 
 ```{r,echo=F}
-#dnorm(x,mu,sig)和dnorm((x-mu)/sig)是不同的
-#因为是密度所以相差了一个sig倍
+ggplot(data=geyser)+
+  geom_histogram(aes(duration,..density..),bins=30)+
+  geom_density(aes(duration))
+```
+
+## 4.分析结果
+
+&emsp;&emsp;
+通过以上图像，可以看到这些数据都具有明显的双峰性质，这一点通过密度函数图形可以更直观的看出，但同时也发现密度函数对数据分布情况的拟合并不是那么理想，所以需要使用一种更加准确的模型来进行拟合。对于这种具有双峰形式的数据，用两个正态分布的复合去逼近是一个很好地选择。其形式为
+$$
+\frac{p}{\sigma_1}\phi(\frac{x-\mu_1}{\sigma_1})+\frac{1-p}{\sigma_2}\phi(\frac{x-\mu_2}{\sigma_2})
+$$
+&emsp;&emsp;
+我们采用极大似然的方法来拟合这一模型，用于拟合此类模型相似程度的log-似然方程(Redner and Walker, 1984; Ingrassia, 1992)为如下形式：
+$$
+L(p,\mu_1,\sigma_1,\mu_2,\sigma_2)=\sum_{i=1}^nlog[\frac{p}{\sigma_1}\phi(\frac{y_i-\mu_1}{\sigma_1})+\frac{1-p}{\sigma_2}\phi(\frac{y_i-\mu_2}{\sigma_2})]
+$$
+目标是优化$-L$使其收敛到极小值。
+
+# 三.模型拟合
+
+&emsp;&emsp;
+首先建立一个计算L的函数命名为b_fit()，其第一个参数$coe$存放的是$(p,\mu_1,\sigma_1,\mu_2,\sigma_2)$，第二个参数$x$存放的就是待拟合的数据，在这里分别要使用的是是geyser\$waiting,geyser3\$waiting，geyser\$duration，返回结果是log-似然方程的相反数或Inf。
+
+```{r}
 b_fit<-function(coe,x){
   result<-coe[1]*dnorm((x-coe[2])/coe[3])/coe[3]+
     (1-coe[1])*dnorm((x-coe[4])/coe[5])/coe[5]
@@ -83,7 +123,20 @@ b_fit<-function(coe,x){
 }
 ```
 
+&emsp;&emsp;
+还需要建立一个在得到参数之后根据坐标计算密度的函数，命名为fit_line，其中参数$x$是给定的横坐标序列，$coe$是优化得出的参数，返回结果是横坐标序列对应的密度序列。
+```{r}
+fit_line<-function(x,coe){
+  result<-coe[1]*dnorm(x,coe[2],coe[3])+
+    (1-coe[1])*dnorm(x,coe[4],coe[5])
+  return(result)
+}
+```
 
+## 1.拟合全体waiting值分布
+
+&emsp;&emsp;
+取$p$的初值为左边驼峰总面积的比例，大致是waiting$\leq65$时waiting_density\$density的和。取$\mu_1$初值为左边驼峰大概的中心位置，取为52。取$\sigma_1$初值为使$(\mu_1-\sigma_1,\mu_1+\sigma_1)$区域的面积占左边驼峰面积70%的值，大约为5。对右边驼峰，做类似的取值，$\mu_1$，$\sigma_1$初值分别取为78和5。用nlm()函数对模型进行拟合。拟合出的参数如下：
 ```{r,echo=F}
 p0<-sum((waiting_density %>%
            filter(waiting<=65))$density)
@@ -93,23 +146,18 @@ mu2<-78
 sig2<-5
 coe0<-c(p0,mu1,sig1,mu2,sig2)
 coe1<-nlm(b_fit,coe0,x=geyser$waiting)$estimate
+print(paste("p:",coe1[1]))
+print(paste(" mu1:",coe1[2]," sig1:",coe1[3]))
+print(paste(" mu2:",coe1[4]," sig2:",coe1[5]))
 ```
 
-
-
-
-```{r,echo=F}
-fit_line<-function(x,coe){
-  result<-coe[1]*dnorm(x,coe[2],coe[3])+
-    (1-coe[1])*dnorm(x,coe[4],coe[5])
-  return(result)
-}
-```
+&emsp;&emsp;
+用得到的coe的估计值和fit_line()函数将waiting取不同值得密度拟合出来并进行绘图，这里将原数据，密度函数和拟合得到的图形绘制在一起进行对比。
 
 ```{r,echo=F}
 ggplot()+
-  geom_point(aes(x=waiting_density$waiting,
-                 y=waiting_density$density))+
+  geom_histogram(aes(x=geyser$waiting,..density..),
+                 bins=30,fill="gray")+
   geom_density(aes(x=geyser$waiting,color="blue"))+
   geom_line(aes(x=waiting_density$waiting,
               y=fit_line(waiting_density$waiting,coe1),
@@ -126,38 +174,53 @@ ggplot()+
            legend.position = c(0.9, 0.9))
 ```
 
-```{r,echo=F}
+&emsp;&emsp;
+从上图可以看出双正态复合模型在分布的估计上比普通的density要好。由于不是普通的正态分布，所以没有办法直接进行Q-Q检验，需要自己计算对应每个waiting值的分位数在模型中的取值，这里采用的是下降法，通过计算模型分布函数的在每个waiting值的梯度，用下降法逼近得到模型中对应的分位数。所得的结果如下图，横坐标是模型拟合出的分位数，纵坐标是原本waiting值得分为数，从这个Q-Q图可以看出，拟合程度很好。
+
+```{r,message=F}
+attach(geyser)
+pmix2 <- deriv(~ p*pnorm((x-u1)/s1) + (1-p)*pnorm((x-u2)/s2),
+               "x", function(x, p, u1, s1, u2, s2) {})
+pr0<-(seq(along = waiting) - 0.5)/length(waiting)
+x0 <- x1 <- as.vector(sort(waiting))
+del<-1
+i<-0
+while((i <- i + 1) < 10 && abs(del) > 0.0005) {
+  pr <- pmix2(x0,coe1[1],coe1[2],coe1[3],coe1[4],coe1[5])
+  del <- (pr - pr0)/attr(pr, "gradient")
+  x0 <- x0 - 0.5*del
+  del <- max(abs(del))
+}
+detach()
 ggplot()+
-  geom_point(aes(x=fit_line(waiting_density$waiting,coe1),
-                 y=waiting_density$density))+
-  geom_line(aes(
-    x=fit_line(waiting_density$waiting,coe1),
-    y=fit_line(waiting_density$waiting,coe1),
-    color="red"))
+  geom_point(aes(x=x1,y=x0))+
+  geom_line(aes(x=x1,y=x1),col="red")+
+  labs(x="fitting model",y="waiting time",title="Q-Q")
 ```
 
+## 2.拟合duration大于3的waiting值分布
+
+&emsp;&emsp;
+这里的操作和之前的类似，取初值p为waiting$\leq$66时的密度和，取$\mu1$为53，$\sigma_1$为5，$\mu_2$为78，$\sigma_2$为5。用来拟合的数据是geyser3\$waiting。拟合出的参数如下：
 ```{r,echo=F,message=F}
-wtds3<-geyser3 %>% group_by(waiting) %>%
-  summarize(density=length(waiting)/dim(geyser3)[1]) %>%
-  ungroup()
-ggplot()+
-  geom_point(aes(x=wtds3$waiting,y=wtds3$density))+
-  geom_density(aes(x=geyser3$waiting))
-```
-
-```{r,echo=F}
 p0=sum((wtds3 %>% filter(waiting<=66))$density)
 mu1=53
 sig1=5
 mu2=78
 sig2=5
-coe2<-nlm(b_fit,c(p0,mu1,sig1,mu2,sig2),geyser3$waiting)$estimate
+coe2<-nlm(b_fit,c(p0,mu1,sig1,mu2,sig2),
+          geyser3$waiting)$estimate
+print(paste("p:",coe2[1]))
+print(paste(" mu1:",coe2[2]," sig1:",coe2[3]))
+print(paste(" mu2:",coe2[4]," sig2:",coe2[5]))
 ```
 
+&emsp;&emsp;
+同样，将原数据，密度函数和拟合得到的图形绘制在一起进行对比。
 ```{r,echo=F}
 ggplot()+
-  geom_point(aes(x=wtds3$waiting,
-                 y=wtds3$density))+
+  geom_histogram(aes(x=geyser3$waiting,..density..)
+                 ,fill="gray")+
   geom_density(aes(x=geyser3$waiting,color="blue"))+
   geom_line(aes(x=wtds3$waiting,
               y=fit_line(wtds3$waiting,coe2),
@@ -167,19 +230,39 @@ ggplot()+
                      values = c( "blue"='blue',
                                  'red'='red'), 
                      breaks = c('blue','red' ),
-                     labels = c('density function',
+                     labels = c('geom_density',
                                 'fitting model'))+
   theme(legend.title=element_blank(),
            legend.position = c(0.9, 0.9))
 ```
-
-```{r,echo=F}
-ggplot(data=geyser)+
-  geom_histogram(aes(duration,..density..),bins=30)+
-  geom_density(aes(duration))
+```{r,message=F}
+attach(geyser3)
+pmix2 <- deriv(~ p*pnorm((x-u1)/s1) + (1-p)*pnorm((x-u2)/s2),
+               "x", function(x, p, u1, s1, u2, s2) {})
+pr0<-(seq(along = waiting) - 0.5)/length(waiting)
+x0 <- x1 <- as.vector(sort(waiting))
+del<-1
+i<-0
+while((i <- i + 1) < 10 && abs(del) > 0.0005) {
+  pr <- pmix2(x0,coe2[1],coe2[2],coe2[3],coe2[4],coe2[5])
+  del <- (pr - pr0)/attr(pr, "gradient")
+  x0 <- x0 - 0.5*del
+  del <- max(abs(del))
+}
+detach()
+ggplot()+
+  geom_point(aes(x=x1,y=x0))+
+  geom_line(aes(x=x1,y=x1),col="red")+
+  labs(x="fitting model",y="waiting time",title="Q-Q")
 ```
+&emsp;&emsp;
+可以看到，在这种情况下，双正态复合模型的表现也很好。
 
-```{r,echo=F}
+## 3.拟合全体duration值分布
+
+&emsp;&emsp;
+取初值p为duration$\leq$3时的密度和，$\mu_1$为2，$\sigma_1$为0.5，$\mu_2$为4，$\sigma_2$为0.5，数据用geyser$duration。拟合出的参数如下。
+```{r,echo=F,message=F}
 p0=length((geyser %>% filter(duration<=3))$duration)/dim(geyser)[1]
 mu1=2
 sig1=0.5
@@ -187,30 +270,62 @@ mu2=4
 sig2=0.5
 coe3<-nlm(b_fit,c(p0,mu1,sig1,mu2,sig2),
     x=geyser$duration)$estimate
+print(paste("p:",coe3[1]))
+print(paste(" mu1:",coe3[2]," sig1:",coe3[3]))
+print(paste(" mu2:",coe3[4]," sig2:",coe3[5]))
 ```
 
+&emsp;&emsp;
+同样进行绘图。
 ```{r,echo=F}
-geyser3<-geyser %>% arrange(duration)
 ggplot(data=geyser)+
-  geom_histogram(aes(duration,..density..),bins=30)+
-  geom_density(aes(duration,color="blue"),size=1)+
+  geom_histogram(aes(duration,..density..),bins=30,
+                 fill="gray")+
+  geom_density(aes(duration,color="blue"))+
   geom_line(aes(x=seq(0.5,5.5,5/298),
                 y=fit_line(seq(0.5,5.5,5/298),coe3),
-                color="red"),size=1)+
+                color="red"))+
   labs(x="duration",y="density",
        theme="duration distribution")+
   scale_color_manual(name = "group",
                      values = c( "blue"='blue',
                                  'red'='red'), 
                      breaks = c('blue','red' ),
-                     labels = c('density fuction',
+                     labels = c('geom_density',
                                 'fitting model'))+
   theme(legend.title=element_blank(),
            legend.position = c(0.9, 0.9))
 ```
+```{r,message=F}
+attach(geyser)
+pmix2<-deriv(~ p*pnorm((x-u1)/s1) + (1-p)*pnorm((x-u2)/s2),
+               "x", function(x, p, u1, s1, u2, s2) {})
+x1<-as.vector(sort(duration))
+x1<-x1[2:length(x1)]
+x0<-x1
+pr0<-(seq(along = x0) - 0.5)/length(x0)
+del<-1
+i<-0
+while((i <- i + 1) < 10 && abs(del) > 0.0005) {
+  pr <- pmix2(x0,coe3[1],coe3[2],coe3[3],coe3[4],coe3[5])
+  del <- (pr - pr0)/attr(pr, "gradient")
+  x0 <- x0 - 0.5*del
+  del <- max(abs(del))
+}
+detach()
+ggplot()+
+  geom_point(aes(x=x1,y=x0))+
+  geom_line(aes(x=x1,y=x1),col="red")+
+  labs(x="fitting model",y="duration",title="Q-Q")
+```
 
+&emsp;&emsp;
+在进行Q-Q检验时，发现有一个数据非常严重的偏离了Q-Q图像中的y=x直线，导致没有办法良好的现实其他数据点的Q-Q检验情况，于是对这一数据点予以剔除，并将余下的数据点的Q-Q图像绘制出，发现除了两个驼峰中心附近的比较稠密的点拟合程度较好，其他数据点的Q-Q检验都发生了一定的偏移，这说明双正态复合模型并不是对所有的具有双峰性质的数据都能做到很准确的拟合。
 
+# 四.结论
 
+&emsp;&emsp;
+通过以上拟合可以发现，对于一般的具有双峰性质的数据，采用双正态复合模型进行拟合可以对其分布有一个比较准确地拟合。但对一些特殊的数据，例如在duration中存在大量数据都集中在一个单一值形成了尖刺状，这种类型的数据很难被由两个正态分布符合而成的模型所描绘，所以并不能十分准确的拟合，但单从图形上看，拟合的效果比density还是要好一些。
 
 
 
